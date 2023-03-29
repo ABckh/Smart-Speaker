@@ -73,6 +73,16 @@ public class PicovoiceBuilder {
                             player.setVolume(100);
                         }
                     }
+                    case "PlayAnySongByArtist" -> {
+                        String artist = inference.getSlots().get("artist");
+                        System.out.println("Playing tracks by " + artist);
+                        player.playTracksByArtist(artist);
+                    }
+                    case "PlayAnyAlbumByArtist" -> {
+                        String artist = inference.getSlots().get("artist");
+                        System.out.println("Playing album by " + artist);
+                        player.playAlbumByArtist(artist);
+                    }
                 }
             }
         };

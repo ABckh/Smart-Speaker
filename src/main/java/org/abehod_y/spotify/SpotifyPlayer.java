@@ -2,12 +2,18 @@ package org.abehod_y.spotify;
 
 
 import com.google.gson.JsonParser;
+import com.neovisionaries.i18n.CountryCode;
 import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
-import se.michaelthelin.spotify.model_objects.specification.SavedTrack;
+import se.michaelthelin.spotify.model_objects.specification.*;
+import se.michaelthelin.spotify.requests.data.albums.GetAlbumsTracksRequest;
+import se.michaelthelin.spotify.requests.data.artists.GetArtistsAlbumsRequest;
+import se.michaelthelin.spotify.requests.data.artists.GetArtistsTopTracksRequest;
 import se.michaelthelin.spotify.requests.data.player.*;
+import se.michaelthelin.spotify.requests.data.search.simplified.SearchArtistsRequest;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -57,7 +63,7 @@ public class SpotifyPlayer extends SpotifyLibrary {
                 .pauseUsersPlayback()
                 .build();
         try {
-            String string = pauseUsersPlaybackRequest.execute();
+            pauseUsersPlaybackRequest.execute();
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             System.out.println("Error: " + e.getMessage());
         }
@@ -68,7 +74,7 @@ public class SpotifyPlayer extends SpotifyLibrary {
                 .startResumeUsersPlayback()
                 .build();
         try {
-            final String string = startResumeUsersPlaybackRequest.execute();
+            startResumeUsersPlaybackRequest.execute();
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             System.out.println("Error: " + e.getMessage());
         }
@@ -105,5 +111,82 @@ public class SpotifyPlayer extends SpotifyLibrary {
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             System.out.println("Error: " + e.getMessage());
         }
+    }
+
+    public void playTracksByArtist(String artistName) {
+        final GetArtistsTopTracksRequest getArtistsTopTracksRequest = this.getSpotifyApi()
+                .getArtistsTopTracks(getArtistId(artistName), CountryCode.LT)
+                .build();
+        try {
+            boolean firstTrack = true;
+            final Track[] tracks = getArtistsTopTracksRequest.execute();
+            List<Track> trackList = Arrays.asList(tracks);
+            Collections.shuffle(trackList);
+            for (Track track : trackList) {
+                if (firstTrack) {
+                    playTrack(track.getId());
+                    firstTrack = false;
+                } else {
+                    addTrackToQueue(track.getUri());
+                }
+            }
+        } catch (IOException | SpotifyWebApiException | ParseException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    public void playAlbumByArtist(String artistName) {
+        final GetArtistsAlbumsRequest getArtistsAlbumsRequest = this.getSpotifyApi()
+                .getArtistsAlbums(getArtistId(artistName))
+                .build();
+        try {
+            AlbumSimplified[] albums = getArtistsAlbumsRequest.execute().getItems();
+            List<AlbumSimplified> albumList = Arrays.asList(albums);
+            Collections.shuffle(albumList);
+            for (AlbumSimplified album : albumList) {
+                if (album.getAlbumType().getType().equals("album")) {
+                    playAlbumsTracks(album.getId());
+                    break;
+                }
+            }
+        } catch (IOException | SpotifyWebApiException | ParseException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    public void playAlbumsTracks(String albumId) {
+        final GetAlbumsTracksRequest getAlbumsTracksRequest = this.getSpotifyApi()
+                .getAlbumsTracks(albumId)
+                .build();
+        try {
+            final TrackSimplified[] trackSimplifiedPaging = getAlbumsTracksRequest.execute().getItems();
+            boolean firstTrack = true;
+            for (TrackSimplified track : trackSimplifiedPaging) {
+                if (firstTrack) {
+                    playTrack(track.getId());
+                    firstTrack = false;
+                } else {
+                    addTrackToQueue(track.getUri());
+                }
+            }
+        } catch (IOException | SpotifyWebApiException | ParseException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+
+    }
+
+    private String getArtistId(String artistName) {
+        final SearchArtistsRequest searchArtistsRequest = this.getSpotifyApi()
+                .searchArtists(artistName)
+                .build();
+        String artistId = null;
+        try {
+            final Paging<Artist> artistPaging = searchArtistsRequest.execute();
+            Artist artist = artistPaging.getItems()[0];
+            artistId = artist.getId();
+        } catch (IOException | SpotifyWebApiException | ParseException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+        return artistId;
     }
 }

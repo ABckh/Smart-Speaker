@@ -46,7 +46,7 @@ public class SpotifyBuilder {
             InputStream input = new FileInputStream("src/main/resources/config.properties");
             Properties prop = new Properties();
             prop.load(input);
-            prop.setProperty("accessToken", newAccessToken);
+            prop.setProperty("accessTokenSpotify", newAccessToken);
         } catch (IOException e) {
             System.out.println("Error: " + e.getMessage());
         }
