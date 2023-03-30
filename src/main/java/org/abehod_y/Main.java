@@ -28,7 +28,7 @@ public class Main {
         String contextPath = prop.getProperty("contextPath");
 
         try {
-            PorcupineRunner porcupine = new PorcupineRunner(accessKey, keywordPath, contextPath,  spotifyPlayer);
+            PorcupineRunner porcupine = new PorcupineRunner(accessKey, keywordPath, contextPath, spotifyPlayer);
             porcupine.run();
         } catch (Exception e) {
             e.printStackTrace();
