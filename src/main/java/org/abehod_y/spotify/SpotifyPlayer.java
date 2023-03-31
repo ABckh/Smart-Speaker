@@ -1,6 +1,5 @@
 package org.abehod_y.spotify;
 
-
 import com.google.gson.JsonParser;
 import com.neovisionaries.i18n.CountryCode;
 import org.apache.hc.core5.http.ParseException;
@@ -9,8 +8,8 @@ import se.michaelthelin.spotify.model_objects.specification.*;
 import se.michaelthelin.spotify.requests.data.albums.GetAlbumsTracksRequest;
 import se.michaelthelin.spotify.requests.data.artists.GetArtistsAlbumsRequest;
 import se.michaelthelin.spotify.requests.data.artists.GetArtistsTopTracksRequest;
+import se.michaelthelin.spotify.requests.data.browse.GetRecommendationsRequest;
 import se.michaelthelin.spotify.requests.data.player.*;
-import se.michaelthelin.spotify.requests.data.search.simplified.SearchArtistsRequest;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -26,34 +25,38 @@ public class SpotifyPlayer extends SpotifyLibrary {
     }
 
     public void playSomething() {
-        List<SavedTrack> savedTracks = this.getUserSavedTracks();
+        List<SavedTrack> savedTracks = Arrays.asList(getUserSavedTracks());
         Collections.shuffle(savedTracks);
-        boolean isFirstTrack = true;
-        for (SavedTrack savedTrack : savedTracks) {
-            if (isFirstTrack) { playTrack(savedTrack.getTrack().getId()); isFirstTrack = false; }
-            else addTrackToQueue(savedTrack.getTrack().getUri());
+        if (!savedTracks.isEmpty()) {
+            SavedTrack firstTrack = savedTracks.get(0);
+            playTrack(firstTrack.getTrack().getId());
+
+            for (SavedTrack track : savedTracks.subList(1, savedTracks.size())) {
+                addTrackToQueue(track.getTrack().getUri());
+            }
         }
+
     }
 
-    public void playTrack(String trackId) {
-        StartResumeUsersPlaybackRequest playRequest = this.getSpotifyApi().startResumeUsersPlayback()
-                .uris(JsonParser.parseString("[\"spotify:track:" + trackId + "\"]").getAsJsonArray())
-                .device_id(this.getDeviceId())
+    public void playRecommendations(String genre) {
+        genre = genre.replace(" ", "-");
+        final GetRecommendationsRequest getRecommendationsRequest = this.getSpotifyApi()
+                .getRecommendations()
+                .seed_genres(genre)
+                .target_popularity(100)
                 .build();
         try {
-            playRequest.execute();
-        } catch (IOException | SpotifyWebApiException | ParseException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
-    }
+            final List<TrackSimplified> recommendations = Arrays.asList(getRecommendationsRequest.execute().getTracks());
+            Collections.shuffle(recommendations);
+            if (!recommendations.isEmpty()) {
+                TrackSimplified firstTrack = recommendations.get(0);
+                playTrack(firstTrack.getId());
 
-    public void addTrackToQueue(String trackUri) {
-        final AddItemToUsersPlaybackQueueRequest addItemToUsersPlaybackQueueRequest = this.getSpotifyApi()
-                .addItemToUsersPlaybackQueue(trackUri)
-                .build();
-        try {
-            addItemToUsersPlaybackQueueRequest.execute();
-        } catch (IOException | SpotifyWebApiException | ParseException e) {
+                for (TrackSimplified track : recommendations.subList(1, recommendations.size())) {
+                    addTrackToQueue(track.getUri());
+                }
+            }
+        } catch (IOException | SpotifyWebApiException | ParseException e){
             System.out.println("Error: " + e.getMessage());
         }
     }
@@ -118,15 +121,12 @@ public class SpotifyPlayer extends SpotifyLibrary {
                 .getArtistsTopTracks(getArtistId(artistName), CountryCode.LT)
                 .build();
         try {
-            boolean firstTrack = true;
-            final Track[] tracks = getArtistsTopTracksRequest.execute();
-            List<Track> trackList = Arrays.asList(tracks);
-            Collections.shuffle(trackList);
-            for (Track track : trackList) {
-                if (firstTrack) {
-                    playTrack(track.getId());
-                    firstTrack = false;
-                } else {
+            List<Track> tracks = Arrays.asList(getArtistsTopTracksRequest.execute());
+            if (!tracks.isEmpty()) {
+                Track firstTrack = tracks.get(0);
+                playTrack(firstTrack.getId());
+
+                for (Track track : tracks.subList(1, tracks.size())) {
                     addTrackToQueue(track.getUri());
                 }
             }
@@ -140,15 +140,12 @@ public class SpotifyPlayer extends SpotifyLibrary {
                 .getArtistsAlbums(getArtistId(artistName))
                 .build();
         try {
-            AlbumSimplified[] albums = getArtistsAlbumsRequest.execute().getItems();
-            List<AlbumSimplified> albumList = Arrays.asList(albums);
-            Collections.shuffle(albumList);
-            for (AlbumSimplified album : albumList) {
-                if (album.getAlbumType().getType().equals("album")) {
-                    playAlbumsTracks(album.getId());
-                    break;
-                }
-            }
+            List<AlbumSimplified> albums = Arrays.asList(getArtistsAlbumsRequest.execute().getItems());
+            Collections.shuffle(albums);
+            albums.stream()
+                    .filter(album -> album.getAlbumType().getType().equals("album"))
+                    .findFirst()
+                    .ifPresent(album -> playAlbumsTracks(album.getId()));
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             System.out.println("Error: " + e.getMessage());
         }
@@ -159,14 +156,13 @@ public class SpotifyPlayer extends SpotifyLibrary {
                 .getAlbumsTracks(albumId)
                 .build();
         try {
-            final TrackSimplified[] trackSimplifiedPaging = getAlbumsTracksRequest.execute().getItems();
-            boolean firstTrack = true;
-            for (TrackSimplified track : trackSimplifiedPaging) {
-                if (firstTrack) {
-                    playTrack(track.getId());
-                    firstTrack = false;
-                } else {
-                    addTrackToQueue(track.getUri());
+            final TrackSimplified[] tracks = getAlbumsTracksRequest.execute().getItems();
+            if (tracks.length > 0) {
+                TrackSimplified firstTrack = tracks[0];
+                playTrack(firstTrack.getId());
+
+                for (int i = 1; i < tracks.length; i++) {
+                    addTrackToQueue(tracks[i].getUri());
                 }
             }
         } catch (IOException | SpotifyWebApiException | ParseException e) {
@@ -175,18 +171,26 @@ public class SpotifyPlayer extends SpotifyLibrary {
 
     }
 
-    private String getArtistId(String artistName) {
-        final SearchArtistsRequest searchArtistsRequest = this.getSpotifyApi()
-                .searchArtists(artistName)
+    public void playTrack(String trackId) {
+        StartResumeUsersPlaybackRequest playRequest = this.getSpotifyApi().startResumeUsersPlayback()
+                .uris(JsonParser.parseString("[\"spotify:track:" + trackId + "\"]").getAsJsonArray())
+                .device_id(this.getDeviceId())
                 .build();
-        String artistId = null;
         try {
-            final Paging<Artist> artistPaging = searchArtistsRequest.execute();
-            Artist artist = artistPaging.getItems()[0];
-            artistId = artist.getId();
+            playRequest.execute();
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             System.out.println("Error: " + e.getMessage());
         }
-        return artistId;
+    }
+
+    public void addTrackToQueue(String trackUri) {
+        final AddItemToUsersPlaybackQueueRequest addItemToUsersPlaybackQueueRequest = this.getSpotifyApi()
+                .addItemToUsersPlaybackQueue(trackUri)
+                .build();
+        try {
+            addItemToUsersPlaybackQueueRequest.execute();
+        } catch (IOException | SpotifyWebApiException | ParseException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 }

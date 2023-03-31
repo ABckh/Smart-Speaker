@@ -67,8 +67,8 @@ public class PicovoiceBuilder {
                     }
                     case "SetVolume" -> {
                         System.out.println("Setting volume...");
-                        if (inference.getSlots().containsKey("volume")) {
-                            player.setVolume(Integer.parseInt(inference.getSlots().get("volume")));
+                        if (slots.containsKey("volume")) {
+                            player.setVolume(Integer.parseInt(slots.get("volume")));
                         } else {
                             player.setVolume(100);
                         }

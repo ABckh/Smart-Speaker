@@ -1,4 +1,5 @@
 src/main/resources/config.properties
+.DS_Store
 
 HELP.md
 target/
