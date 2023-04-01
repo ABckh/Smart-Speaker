@@ -9,6 +9,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class SpotifyBuilder {
     private final String deviceId;
@@ -29,16 +31,23 @@ public class SpotifyBuilder {
     }
 
     public void updateToken() {
-        try {
-            AuthorizationCodeRefreshRequest authorizationCodeRefreshRequest = spotifyApi.authorizationCodeRefresh().build();
-            String newAccessToken = authorizationCodeRefreshRequest
-                    .execute()
-                    .getAccessToken();
-            updateTokenInProperties(newAccessToken);
-            spotifyApi.setAccessToken(newAccessToken);
-        } catch (IOException | ParseException | SpotifyWebApiException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
+        Timer timer = new Timer();
+        TimerTask hourlyTask = new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    AuthorizationCodeRefreshRequest authorizationCodeRefreshRequest = spotifyApi.authorizationCodeRefresh().build();
+                    String newAccessToken = authorizationCodeRefreshRequest
+                            .execute()
+                            .getAccessToken();
+                    updateTokenInProperties(newAccessToken);
+                    spotifyApi.setAccessToken(newAccessToken);
+                } catch (IOException | ParseException | SpotifyWebApiException e) {
+                    System.out.println("Error: " + e.getMessage());
+                }
+            }
+        };
+        timer.schedule(hourlyTask, 0L, 1000*60*60);
     }
 
     private void updateTokenInProperties(String newAccessToken) {
