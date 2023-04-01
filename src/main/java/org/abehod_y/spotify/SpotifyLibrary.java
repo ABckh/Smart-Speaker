@@ -3,27 +3,24 @@ package org.abehod_y.spotify;
 import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.miscellaneous.CurrentlyPlaying;
-import se.michaelthelin.spotify.model_objects.specification.Artist;
-import se.michaelthelin.spotify.model_objects.specification.Paging;
-import se.michaelthelin.spotify.model_objects.specification.SavedTrack;
-import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;
+import se.michaelthelin.spotify.model_objects.specification.*;
 import se.michaelthelin.spotify.requests.data.library.GetUsersSavedTracksRequest;
 import se.michaelthelin.spotify.requests.data.library.RemoveUsersSavedTracksRequest;
 import se.michaelthelin.spotify.requests.data.library.SaveTracksForUserRequest;
 import se.michaelthelin.spotify.requests.data.player.GetUsersCurrentlyPlayingTrackRequest;
 import se.michaelthelin.spotify.requests.data.search.simplified.SearchArtistsRequest;
+import se.michaelthelin.spotify.requests.data.search.simplified.SearchPlaylistsRequest;
 
 import java.io.IOException;
-import java.util.List;
 
 public class SpotifyLibrary extends SpotifyBuilder {
 
-    public SpotifyLibrary(String clientId, String clientSecret, String deviceId,
+    SpotifyLibrary(String clientId, String clientSecret, String deviceId,
             String accessToken, String refreshToken) {
         super(clientId, clientSecret, deviceId, accessToken, refreshToken);
     }
 
-    public SavedTrack[] getUserSavedTracks() {
+    SavedTrack[] getUserSavedTracks() {
         GetUsersSavedTracksRequest getUsersSavedTracksRequest = this.getSpotifyApi().getUsersSavedTracks()
                 .limit(50)
                 .offset(0)
@@ -94,4 +91,21 @@ public class SpotifyLibrary extends SpotifyBuilder {
         return artistId;
     }
 
+    String getReleaseRadarPlaylistId() {
+        final SearchPlaylistsRequest searchPlaylistRequest = this.getSpotifyApi()
+                .searchPlaylists("Release Radar")
+                .build();
+
+        String playlistId = null;
+        try {
+             PlaylistSimplified[] playlists = searchPlaylistRequest
+                    .execute()
+                    .getItems();
+
+             playlistId = playlists[0].getId();
+        } catch (IOException | SpotifyWebApiException | ParseException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+        return playlistId;
+    }
 }

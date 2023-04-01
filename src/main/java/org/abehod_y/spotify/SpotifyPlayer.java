@@ -9,7 +9,9 @@ import se.michaelthelin.spotify.requests.data.albums.GetAlbumsTracksRequest;
 import se.michaelthelin.spotify.requests.data.artists.GetArtistsAlbumsRequest;
 import se.michaelthelin.spotify.requests.data.artists.GetArtistsTopTracksRequest;
 import se.michaelthelin.spotify.requests.data.browse.GetRecommendationsRequest;
+import se.michaelthelin.spotify.requests.data.library.GetCurrentUsersSavedAlbumsRequest;
 import se.michaelthelin.spotify.requests.data.player.*;
+import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistsItemsRequest;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -24,7 +26,7 @@ public class SpotifyPlayer extends SpotifyLibrary {
         super(clientId, clientSecret, deviceId, accessToken, refreshToken);
     }
 
-    public void playSomething() {
+    public void playSomeMusic() {
         List<SavedTrack> savedTracks = Arrays.asList(getUserSavedTracks());
         Collections.shuffle(savedTracks);
         if (!savedTracks.isEmpty()) {
@@ -35,7 +37,6 @@ public class SpotifyPlayer extends SpotifyLibrary {
                 addTrackToQueue(track.getTrack().getUri());
             }
         }
-
     }
 
     public void playRecommendations(String genre) {
@@ -154,6 +155,7 @@ public class SpotifyPlayer extends SpotifyLibrary {
     public void playAlbumsTracks(String albumId) {
         final GetAlbumsTracksRequest getAlbumsTracksRequest = this.getSpotifyApi()
                 .getAlbumsTracks(albumId)
+                .limit(50)
                 .build();
         try {
             final TrackSimplified[] tracks = getAlbumsTracksRequest.execute().getItems();
@@ -168,7 +170,6 @@ public class SpotifyPlayer extends SpotifyLibrary {
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             System.out.println("Error: " + e.getMessage());
         }
-
     }
 
     public void playTrack(String trackId) {
@@ -189,6 +190,46 @@ public class SpotifyPlayer extends SpotifyLibrary {
                 .build();
         try {
             addItemToUsersPlaybackQueueRequest.execute();
+        } catch (IOException | SpotifyWebApiException | ParseException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    public void playNewMusic() {
+        String playlistId = getReleaseRadarPlaylistId();
+        playPlaylistsTracks(playlistId);
+    }
+
+    private void playPlaylistsTracks(String playlistId) {
+        final GetPlaylistsItemsRequest getPlaylistsItemsRequest = this.getSpotifyApi()
+                .getPlaylistsItems(playlistId)
+                .build();
+
+        try {
+            final List<PlaylistTrack> tracks = Arrays.asList(getPlaylistsItemsRequest.execute().getItems());
+            Collections.shuffle(tracks);
+            if (!tracks.isEmpty()) {
+                PlaylistTrack firstTrack = tracks.get(0);
+                playTrack(firstTrack.getTrack().getId());
+
+                for (PlaylistTrack track : tracks.subList(1, tracks.size())) {
+                    addTrackToQueue(track.getTrack().getUri());
+                }
+            }
+        } catch (IOException | SpotifyWebApiException | ParseException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    public void playSomeAlbum() {
+        final GetCurrentUsersSavedAlbumsRequest getCurrentUsersSavedAlbumsRequest = this.getSpotifyApi()
+                .getCurrentUsersSavedAlbums()
+                .limit(50)
+                .build();
+        try {
+            List<SavedAlbum> savedAlbums = Arrays.asList(getCurrentUsersSavedAlbumsRequest.execute().getItems());
+            Collections.shuffle(savedAlbums);
+            playAlbumsTracks(savedAlbums.get(0).getAlbum().getId());
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             System.out.println("Error: " + e.getMessage());
         }

@@ -11,7 +11,7 @@ import java.util.Map;
 public class PicovoiceBuilder {
     private Picovoice picovoice;
 
-    public PicovoiceBuilder(String accessKey, String keywordPath, String contextPath, SpotifyPlayer spotifyPlayer) {
+    PicovoiceBuilder(String accessKey, String keywordPath, String contextPath, SpotifyPlayer spotifyPlayer) {
         try {
             this.picovoice = new Picovoice.Builder()
                     .setAccessKey(accessKey)
@@ -37,9 +37,14 @@ public class PicovoiceBuilder {
                 final String intent = inference.getIntent();
                 final Map<String, String> slots = inference.getSlots();
                 switch (intent) {
-                    case "PlayMusic" -> {
+                    case "PlaySomeMusic" -> {
                         System.out.println("Playing music on spotify");
-                        player.playSomething();
+                        if (slots.containsKey("genre")) {
+                            player.playRecommendations(slots.get("genre"));
+                        } else if (slots.containsKey("item")) {
+                            if (slots.get("item").equals("music")) player.playSomeMusic();
+                            else player.playSomeAlbum();
+                        }
                     }
                     case "Pause" -> {
                         System.out.println("Stopping...");
@@ -49,39 +54,35 @@ public class PicovoiceBuilder {
                         System.out.println("Resuming...");
                         player.resumePlaying();
                     }
-                    case "Next" -> {
-                        System.out.println("Playing next track...");
-                        player.nextTrack();
+                    case "ChangeTrack" -> {
+                        if (slots.containsKey("pointer")) {
+                            System.out.println("Changing track...");
+                            if (slots.get("pointer").equals("next")) player.nextTrack();
+                            else player.previousTrack();
+                        }
                     }
-                    case "Previous" -> {
-                        System.out.println("Playing previous track...");
-                        player.previousTrack();
-                    }
-                    case "AddTrack" -> {
-                        System.out.println("Added track to liked");
-                        player.saveTrackToLiked();
-                    }
-                    case "RemoveTrack" -> {
-                        System.out.println("Removed track from library");
-                        player.removeTrackFromLiked();
+                    case "AddRemoveTrack" -> {
+                        if (slots.containsKey("action")) {
+                            System.out.println("Added or Removed track");
+                            if (slots.get("action").equals("add")) player.saveTrackToLiked();
+                            else player.removeTrackFromLiked();
+                        }
                     }
                     case "SetVolume" -> {
                         System.out.println("Setting volume...");
-                        if (slots.containsKey("volume")) {
-                            player.setVolume(Integer.parseInt(slots.get("volume")));
-                        } else {
-                            player.setVolume(100);
+                        if (slots.containsKey("volume")) player.setVolume(Integer.parseInt(slots.get("volume")));
+                        else player.setVolume(100);
+                    }
+                    case "PlayByArtist" -> {
+                        if (slots.containsKey("type") && slots.containsKey("artist")) {
+                            System.out.println("Playing music by artist");
+                            if (slots.get("type").equals("song")) player.playTracksByArtist(slots.get("artist"));
+                            else player.playAlbumByArtist(slots.get("artist"));
                         }
                     }
-                    case "PlayAnySongByArtist" -> {
-                        String artist = inference.getSlots().get("artist");
-                        System.out.println("Playing tracks by " + artist);
-                        player.playTracksByArtist(artist);
-                    }
-                    case "PlayAnyAlbumByArtist" -> {
-                        String artist = inference.getSlots().get("artist");
-                        System.out.println("Playing album by " + artist);
-                        player.playAlbumByArtist(artist);
+                    case "PlayNewMusic" -> {
+                        System.out.println("Playing new music");
+                        player.playNewMusic();
                     }
                 }
             }
