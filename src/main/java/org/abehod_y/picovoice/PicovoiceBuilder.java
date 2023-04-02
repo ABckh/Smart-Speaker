@@ -84,6 +84,9 @@ public class PicovoiceBuilder {
                         System.out.println("Playing new music");
                         player.playNewMusic();
                     }
+                    case "PlayConcreteSongOrAlbum" -> {
+
+                    }
                 }
             }
         };

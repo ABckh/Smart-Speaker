@@ -1,6 +1,5 @@
 package org.abehod_y.picovoice;
 
-import ai.picovoice.picovoice.Picovoice;
 import ai.picovoice.picovoice.PicovoiceException;
 import org.abehod_y.spotify.SpotifyPlayer;
 
@@ -15,17 +14,7 @@ public class PorcupineRunner extends PicovoiceBuilder {
     }
 
     public void run() {
-        AudioFormat format = new AudioFormat(16000f, 16,
-                1, true, false);
-        DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, format);
-        TargetDataLine micDataLine;
-        try {
-            micDataLine = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
-            micDataLine.open(format);
-        } catch (LineUnavailableException e) {
-            System.err.println("Failed to get a valid audio capture device.");
-            return;
-        }
+        TargetDataLine micDataLine = getMicDataLine();
 
         // start audio capture
         micDataLine.start();
@@ -56,5 +45,19 @@ public class PorcupineRunner extends PicovoiceBuilder {
                 System.out.println("Error: " + e.getMessage());
             }
         }
+    }
+
+    private TargetDataLine getMicDataLine() {
+        AudioFormat format = new AudioFormat(16000f, 16,
+                1, true, false);
+        DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, format);
+        TargetDataLine micDataLine = null;
+        try {
+            micDataLine = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
+            micDataLine.open(format);
+        } catch (LineUnavailableException e) {
+            System.err.println("Failed to get a valid audio capture device.");
+        }
+        return micDataLine;
     }
 }

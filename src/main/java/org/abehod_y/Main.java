@@ -1,5 +1,7 @@
 package org.abehod_y;
 
+import org.abehod_y.picovoice.CheetahRunner;
+import org.abehod_y.picovoice.CheetahRunner;
 import org.abehod_y.picovoice.PorcupineRunner;
 import org.abehod_y.spotify.SpotifyPlayer;
 
@@ -27,11 +29,16 @@ public class Main {
         String keywordPath = prop.getProperty("keywordPath");
         String contextPath = prop.getProperty("contextPath");
 
-        try {
-            PorcupineRunner porcupine = new PorcupineRunner(accessKey, keywordPath, contextPath, spotifyPlayer);
-            porcupine.run();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        CheetahRunner cheetah = new CheetahRunner(
+            prop.getProperty("accessKey")
+        );
+        cheetah.run();
+//        leopard.run();
+//        try {
+//            PorcupineRunner porcupine = new PorcupineRunner(accessKey, keywordPath, contextPath, spotifyPlayer);
+//            porcupine.run();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 }
