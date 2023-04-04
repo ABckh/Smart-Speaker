@@ -9,6 +9,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -29,16 +31,11 @@ public class Main {
         String keywordPath = prop.getProperty("keywordPath");
         String contextPath = prop.getProperty("contextPath");
 
-        CheetahRunner cheetah = new CheetahRunner(
-            prop.getProperty("accessKey")
-        );
-        cheetah.run();
-//        leopard.run();
-//        try {
-//            PorcupineRunner porcupine = new PorcupineRunner(accessKey, keywordPath, contextPath, spotifyPlayer);
-//            porcupine.run();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        try {
+            PorcupineRunner porcupine = new PorcupineRunner(accessKey, keywordPath, contextPath, spotifyPlayer);
+            porcupine.run();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

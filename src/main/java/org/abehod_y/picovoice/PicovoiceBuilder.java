@@ -6,13 +6,16 @@ import ai.picovoice.picovoice.PicovoiceInferenceCallback;
 import ai.picovoice.picovoice.PicovoiceWakeWordCallback;
 import org.abehod_y.spotify.SpotifyPlayer;
 
+import javax.sound.sampled.*;
 import java.util.Map;
 
 public class PicovoiceBuilder {
     private Picovoice picovoice;
+    private String accessKey;
 
     PicovoiceBuilder(String accessKey, String keywordPath, String contextPath, SpotifyPlayer spotifyPlayer) {
         try {
+            this.accessKey = accessKey;
             this.picovoice = new Picovoice.Builder()
                     .setAccessKey(accessKey)
                     .setKeywordPath(keywordPath)
@@ -85,13 +88,33 @@ public class PicovoiceBuilder {
                         player.playNewMusic();
                     }
                     case "PlayConcreteSongOrAlbum" -> {
-
+                        if (slots.containsKey("item")) {
+                            String query = CheetahRunner.getSearchQuery(accessKey);
+                            if (slots.get("item").equals("song")) {
+                                player.playTrackByQuery(query);
+                            } else {
+                                player.playAlbumByQuery(query);
+                            }
+                            System.out.println("Playing " + query);
+                        }
                     }
                 }
             }
         };
     }
-
+    static TargetDataLine getMicDataLine() {
+        AudioFormat format = new AudioFormat(16000f, 16,
+                1, true, false);
+        DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, format);
+        TargetDataLine micDataLine = null;
+        try {
+            micDataLine = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
+            micDataLine.open(format);
+        } catch (LineUnavailableException e) {
+            System.err.println("Failed to get a valid audio capture device.");
+        }
+        return micDataLine;
+    }
     public Picovoice getPicovoice() {
         return picovoice;
     }

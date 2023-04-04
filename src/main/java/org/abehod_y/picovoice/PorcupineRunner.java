@@ -46,18 +46,4 @@ public class PorcupineRunner extends PicovoiceBuilder {
             }
         }
     }
-
-    private TargetDataLine getMicDataLine() {
-        AudioFormat format = new AudioFormat(16000f, 16,
-                1, true, false);
-        DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, format);
-        TargetDataLine micDataLine = null;
-        try {
-            micDataLine = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
-            micDataLine.open(format);
-        } catch (LineUnavailableException e) {
-            System.err.println("Failed to get a valid audio capture device.");
-        }
-        return micDataLine;
-    }
 }
