@@ -5,6 +5,7 @@ import com.neovisionaries.i18n.CountryCode;
 import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.enums.ModelObjectType;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
+import se.michaelthelin.spotify.model_objects.miscellaneous.CurrentlyPlaying;
 import se.michaelthelin.spotify.model_objects.specification.*;
 import se.michaelthelin.spotify.requests.data.albums.GetAlbumsTracksRequest;
 import se.michaelthelin.spotify.requests.data.artists.GetArtistsAlbumsRequest;
@@ -15,6 +16,7 @@ import se.michaelthelin.spotify.requests.data.player.*;
 import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistsItemsRequest;
 import se.michaelthelin.spotify.requests.data.search.SearchItemRequest;
 import se.michaelthelin.spotify.requests.data.search.simplified.SearchAlbumsRequest;
+import se.michaelthelin.spotify.requests.data.search.simplified.SearchArtistsRequest;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -24,12 +26,11 @@ import java.util.List;
 
 public class SpotifyPlayer extends SpotifyLibrary {
 
-    public SpotifyPlayer(String clientId, String clientSecret,
-                         String deviceId, String accessToken, String refreshToken) {
-        super(clientId, clientSecret, deviceId, accessToken, refreshToken);
+    public SpotifyPlayer(String clientId, String clientSecret, String deviceId, String refreshToken) {
+        super(clientId, clientSecret, deviceId,  refreshToken);
     }
 
-    public void playSomeMusic() {
+    public void playSomeMusic() throws IOException, ParseException, SpotifyWebApiException {
         List<SavedTrack> savedTracks = Arrays.asList(getUserSavedTracks());
         Collections.shuffle(savedTracks);
         if (!savedTracks.isEmpty()) {
@@ -42,224 +43,194 @@ public class SpotifyPlayer extends SpotifyLibrary {
         }
     }
 
-    public void playRecommendations(String genre) {
+    public void playRecommendations(String genre) throws IOException, ParseException, SpotifyWebApiException {
         genre = genre.replace(" ", "-");
         final GetRecommendationsRequest getRecommendationsRequest = this.getSpotifyApi()
                 .getRecommendations()
                 .seed_genres(genre)
                 .target_popularity(100)
                 .build();
-        try {
-            final List<TrackSimplified> recommendations = Arrays.asList(getRecommendationsRequest.execute().getTracks());
-            Collections.shuffle(recommendations);
-            if (!recommendations.isEmpty()) {
-                TrackSimplified firstTrack = recommendations.get(0);
-                playTrack(firstTrack.getId());
 
-                for (TrackSimplified track : recommendations.subList(1, recommendations.size())) {
-                    addTrackToQueue(track.getUri());
-                }
+        final List<TrackSimplified> recommendations = Arrays.asList(getRecommendationsRequest.execute().getTracks());
+        Collections.shuffle(recommendations);
+        if (!recommendations.isEmpty()) {
+            TrackSimplified firstTrack = recommendations.get(0);
+            playTrack(firstTrack.getId());
+
+            for (TrackSimplified track : recommendations.subList(1, recommendations.size())) {
+                addTrackToQueue(track.getUri());
             }
-        } catch (IOException | SpotifyWebApiException | ParseException e){
-            System.out.println("Error: " + e.getMessage());
         }
     }
 
-    public void pausePlaying() {
+    public void pausePlaying() throws IOException, ParseException, SpotifyWebApiException {
         final PauseUsersPlaybackRequest pauseUsersPlaybackRequest = this.getSpotifyApi()
                 .pauseUsersPlayback()
                 .build();
-        try {
-            pauseUsersPlaybackRequest.execute();
-        } catch (IOException | SpotifyWebApiException | ParseException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
+        pauseUsersPlaybackRequest.execute();
     }
 
-    public void resumePlaying() {
+    public void resumePlaying() throws IOException, ParseException, SpotifyWebApiException {
         final StartResumeUsersPlaybackRequest startResumeUsersPlaybackRequest = this.getSpotifyApi()
                 .startResumeUsersPlayback()
                 .build();
-        try {
-            startResumeUsersPlaybackRequest.execute();
-        } catch (IOException | SpotifyWebApiException | ParseException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
+        startResumeUsersPlaybackRequest.execute();
     }
 
-    public void nextTrack() {
+    public void nextTrack() throws IOException, ParseException, SpotifyWebApiException {
         final SkipUsersPlaybackToNextTrackRequest skipUsersPlaybackToNextTrackRequest = this.getSpotifyApi()
                 .skipUsersPlaybackToNextTrack()
                 .build();
-        try {
-            skipUsersPlaybackToNextTrackRequest.execute();
-        } catch (IOException | SpotifyWebApiException | ParseException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
+        skipUsersPlaybackToNextTrackRequest.execute();
     }
 
-    public void previousTrack() {
+    public void previousTrack() throws IOException, ParseException, SpotifyWebApiException {
         final SkipUsersPlaybackToPreviousTrackRequest skipUsersPlaybackToPreviousTrackRequest = this.getSpotifyApi()
                 .skipUsersPlaybackToPreviousTrack()
                 .build();
-        try {
-            skipUsersPlaybackToPreviousTrackRequest.execute();
-        } catch (IOException | SpotifyWebApiException | ParseException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
+        skipUsersPlaybackToPreviousTrackRequest.execute();
     }
 
-    public void setVolume(int volumePercent) {
+    public void setVolume(int volumePercent) throws IOException, ParseException, SpotifyWebApiException {
         final SetVolumeForUsersPlaybackRequest setVolumeForUsersPlaybackRequest = this.getSpotifyApi()
                 .setVolumeForUsersPlayback(volumePercent)
                 .build();
-        try {
-            setVolumeForUsersPlaybackRequest.execute();
-        } catch (IOException | SpotifyWebApiException | ParseException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
+        setVolumeForUsersPlaybackRequest.execute();
     }
 
-    public void playTracksByArtist(String artistName) {
+    public void playTracksByArtist(String artistName) throws IOException, ParseException, SpotifyWebApiException {
         final GetArtistsTopTracksRequest getArtistsTopTracksRequest = this.getSpotifyApi()
                 .getArtistsTopTracks(getArtistId(artistName), CountryCode.LT)
                 .build();
-        try {
-            List<Track> tracks = Arrays.asList(getArtistsTopTracksRequest.execute());
-            if (!tracks.isEmpty()) {
-                Track firstTrack = tracks.get(0);
-                playTrack(firstTrack.getId());
 
-                for (Track track : tracks.subList(1, tracks.size())) {
-                    addTrackToQueue(track.getUri());
-                }
+        List<Track> tracks = Arrays.asList(getArtistsTopTracksRequest.execute());
+        if (!tracks.isEmpty()) {
+            Track firstTrack = tracks.get(0);
+            playTrack(firstTrack.getId());
+
+            for (Track track : tracks.subList(1, tracks.size())) {
+                addTrackToQueue(track.getUri());
             }
-        } catch (IOException | SpotifyWebApiException | ParseException e) {
-            System.out.println("Error: " + e.getMessage());
         }
     }
 
-    public void playAlbumByArtist(String artistName) {
+    public void playAlbumByArtist(String artistName) throws IOException, ParseException, SpotifyWebApiException {
         final GetArtistsAlbumsRequest getArtistsAlbumsRequest = this.getSpotifyApi()
                 .getArtistsAlbums(getArtistId(artistName))
                 .build();
-        try {
-            List<AlbumSimplified> albums = Arrays.asList(getArtistsAlbumsRequest.execute().getItems());
-            Collections.shuffle(albums);
-            albums.stream()
-                    .filter(album -> album.getAlbumType().getType().equals("album"))
-                    .findFirst()
-                    .ifPresent(album -> playAlbumsTracks(album.getId()));
-        } catch (IOException | SpotifyWebApiException | ParseException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
+        List<AlbumSimplified> albums = Arrays.asList(getArtistsAlbumsRequest.execute().getItems());
+        Collections.shuffle(albums);
+        albums.stream()
+                .filter(album -> album.getAlbumType().getType().equals("album"))
+                .findFirst()
+                .ifPresent(album -> {
+                    try {
+                        playAlbumsTracks(album.getId());
+                    } catch (IOException | ParseException | SpotifyWebApiException e) {
+                        System.out.println("Error: " + e.getMessage());
+                    }
+                });
     }
 
-    public void playAlbumsTracks(String albumId) {
+    public void playAlbumsTracks(String albumId) throws IOException, ParseException, SpotifyWebApiException {
         final GetAlbumsTracksRequest getAlbumsTracksRequest = this.getSpotifyApi()
                 .getAlbumsTracks(albumId)
                 .limit(50)
                 .build();
-        try {
-            final TrackSimplified[] tracks = getAlbumsTracksRequest.execute().getItems();
-            if (tracks.length > 0) {
-                TrackSimplified firstTrack = tracks[0];
-                playTrack(firstTrack.getId());
+        final TrackSimplified[] tracks = getAlbumsTracksRequest.execute().getItems();
+        if (tracks.length > 0) {
+            TrackSimplified firstTrack = tracks[0];
+            playTrack(firstTrack.getId());
 
-                for (int i = 1; i < tracks.length; i++) {
-                    addTrackToQueue(tracks[i].getUri());
-                }
+            for (int i = 1; i < tracks.length; i++) {
+                addTrackToQueue(tracks[i].getUri());
             }
-        } catch (IOException | SpotifyWebApiException | ParseException e) {
-            System.out.println("Error: " + e.getMessage());
         }
     }
 
-    public void playTrack(String trackId) {
+    public void playTrack(String trackId) throws IOException, ParseException, SpotifyWebApiException {
         StartResumeUsersPlaybackRequest playRequest = this.getSpotifyApi().startResumeUsersPlayback()
                 .uris(JsonParser.parseString("[\"spotify:track:" + trackId + "\"]").getAsJsonArray())
                 .device_id(this.getDeviceId())
                 .build();
-        try {
-            playRequest.execute();
-        } catch (IOException | SpotifyWebApiException | ParseException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
+        playRequest.execute();
     }
 
-    public void addTrackToQueue(String trackUri) {
+    public void addTrackToQueue(String trackUri) throws IOException, ParseException, SpotifyWebApiException {
         final AddItemToUsersPlaybackQueueRequest addItemToUsersPlaybackQueueRequest = this.getSpotifyApi()
                 .addItemToUsersPlaybackQueue(trackUri)
                 .build();
-        try {
-            addItemToUsersPlaybackQueueRequest.execute();
-        } catch (IOException | SpotifyWebApiException | ParseException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
+        addItemToUsersPlaybackQueueRequest.execute();
     }
 
-    public void playNewMusic() {
+    public void playNewMusic() throws IOException, ParseException, SpotifyWebApiException {
         String playlistId = getReleaseRadarPlaylistId();
         playPlaylistsTracks(playlistId);
     }
 
-    private void playPlaylistsTracks(String playlistId) {
+    private void playPlaylistsTracks(String playlistId) throws IOException, ParseException, SpotifyWebApiException {
         final GetPlaylistsItemsRequest getPlaylistsItemsRequest = this.getSpotifyApi()
                 .getPlaylistsItems(playlistId)
                 .build();
 
-        try {
-            final List<PlaylistTrack> tracks = Arrays.asList(getPlaylistsItemsRequest.execute().getItems());
-            Collections.shuffle(tracks);
-            if (!tracks.isEmpty()) {
-                PlaylistTrack firstTrack = tracks.get(0);
-                playTrack(firstTrack.getTrack().getId());
+        final List<PlaylistTrack> tracks = Arrays.asList(getPlaylistsItemsRequest.execute().getItems());
+        Collections.shuffle(tracks);
+        if (!tracks.isEmpty()) {
+            PlaylistTrack firstTrack = tracks.get(0);
+            playTrack(firstTrack.getTrack().getId());
 
-                for (PlaylistTrack track : tracks.subList(1, tracks.size())) {
-                    addTrackToQueue(track.getTrack().getUri());
-                }
+            for (PlaylistTrack track : tracks.subList(1, tracks.size())) {
+                addTrackToQueue(track.getTrack().getUri());
             }
-        } catch (IOException | SpotifyWebApiException | ParseException e) {
-            System.out.println("Error: " + e.getMessage());
         }
     }
 
-    public void playSomeAlbum() {
+    public void playSomeAlbum() throws IOException, ParseException, SpotifyWebApiException {
         final GetCurrentUsersSavedAlbumsRequest getCurrentUsersSavedAlbumsRequest = this.getSpotifyApi()
                 .getCurrentUsersSavedAlbums()
                 .limit(50)
                 .build();
-        try {
-            List<SavedAlbum> savedAlbums = Arrays.asList(getCurrentUsersSavedAlbumsRequest.execute().getItems());
-            Collections.shuffle(savedAlbums);
-            playAlbumsTracks(savedAlbums.get(0).getAlbum().getId());
-        } catch (IOException | SpotifyWebApiException | ParseException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
+        List<SavedAlbum> savedAlbums = Arrays.asList(getCurrentUsersSavedAlbumsRequest.execute().getItems());
+        Collections.shuffle(savedAlbums);
+        playAlbumsTracks(savedAlbums.get(0).getAlbum().getId());
     }
 
-    public void playTrackByQuery(String query) {
+    public void playTrackByQuery(String query) throws IOException, ParseException, SpotifyWebApiException {
         if (query.isEmpty()) return;
         final SearchItemRequest searchItemRequest = this.getSpotifyApi()
                 .searchItem(query, ModelObjectType.TRACK.getType())
                 .build();
-        try {
-            final Track[] searchResult = searchItemRequest.execute().getTracks().getItems();
-            playTrack(searchResult[0].getId());
-        } catch (IOException | SpotifyWebApiException | ParseException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
+        final Track[] searchResult = searchItemRequest.execute().getTracks().getItems();
+        playTrack(searchResult[0].getId());
     }
 
-    public void playAlbumByQuery(String query) {
+    public void playAlbumByQuery(String query) throws IOException, ParseException, SpotifyWebApiException {
+        if (query.isEmpty()) return;
         final SearchAlbumsRequest searchAlbumsRequest = this.getSpotifyApi()
                 .searchAlbums(query)
                 .build();
-        try {
-            final AlbumSimplified[] album = searchAlbumsRequest.execute().getItems();
-            playAlbumsTracks(album[0].getId());
-        } catch (IOException | SpotifyWebApiException | ParseException e) {
-            System.out.println("Error: " + e.getMessage());
+        final AlbumSimplified[] album = searchAlbumsRequest.execute().getItems();
+        playAlbumsTracks(album[0].getId());
+    }
+
+    public String getCurrentlyPlayingTrackId() throws IOException, ParseException, SpotifyWebApiException {
+        final GetUsersCurrentlyPlayingTrackRequest getUsersCurrentlyPlayingTrackRequest = this.getSpotifyApi()
+                .getUsersCurrentlyPlayingTrack()
+                .build();
+        final CurrentlyPlaying currentlyPlaying = getUsersCurrentlyPlayingTrackRequest.execute();
+        String trackId = null;
+        if (currentlyPlaying.getIs_playing()) {
+            trackId = currentlyPlaying.getItem().getId();
         }
+        return trackId;
+    }
+
+    private String getArtistId(String artistName) throws IOException, ParseException, SpotifyWebApiException {
+        final SearchArtistsRequest searchArtistsRequest = this.getSpotifyApi()
+                .searchArtists(artistName)
+                .build();
+        final Paging<Artist> artistPaging = searchArtistsRequest.execute();
+        Artist artist = artistPaging.getItems()[0];
+        return artist.getId();
     }
 }

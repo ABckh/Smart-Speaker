@@ -7,7 +7,7 @@ import org.abehod_y.spotify.SpotifyPlayer;
 
 public class PicovoiceRunner extends PicovoiceBuilder {
 
-    public PicovoiceRunner(String accessKey, String keywordPath, String contextPath, SpotifyPlayer spotifyPlayer) {
+    public PicovoiceRunner(String accessKey, String keywordPath, String contextPath, SpotifyPlayer spotifyPlayer) throws PicovoiceException {
         super(accessKey, keywordPath, contextPath, spotifyPlayer);
     }
 
@@ -17,8 +17,7 @@ public class PicovoiceRunner extends PicovoiceBuilder {
         short[] picovoiceBuffer = microphone.getObjectBuffer();
         this.setMicrophone(microphone);
 
-        boolean recordingCancelled = false;
-        while (!recordingCancelled) {
+        while (true) {
             microphone.readBuffer();
             try {
                 this.getPicovoice().process(picovoiceBuffer);

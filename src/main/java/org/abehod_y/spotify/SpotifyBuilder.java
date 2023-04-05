@@ -5,10 +5,7 @@ import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeRefreshRequest;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -17,17 +14,22 @@ public class SpotifyBuilder {
     private final SpotifyApi spotifyApi;
 
     public SpotifyBuilder(String clientId, String clientSecret,
-                          String deviceId, String accessToken, String refreshToken) {
+                          String deviceId, String refreshToken) {
         this.deviceId = deviceId;
-
-        spotifyApi = new SpotifyApi.Builder()
+        this.spotifyApi = new SpotifyApi.Builder()
                 .setClientId(clientId)
                 .setClientSecret(clientSecret)
-                .setAccessToken(accessToken)
                 .setRefreshToken(refreshToken)
                 .build();
-
         this.updateToken();
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public SpotifyApi getSpotifyApi() {
+        return spotifyApi;
     }
 
     public void updateToken() {
@@ -40,7 +42,6 @@ public class SpotifyBuilder {
                     String newAccessToken = authorizationCodeRefreshRequest
                             .execute()
                             .getAccessToken();
-                    updateTokenInProperties(newAccessToken);
                     spotifyApi.setAccessToken(newAccessToken);
                 } catch (IOException | ParseException | SpotifyWebApiException e) {
                     System.out.println("Error: " + e.getMessage());
@@ -48,24 +49,5 @@ public class SpotifyBuilder {
             }
         };
         timer.schedule(hourlyTask, 0L, 1000*60*60);
-    }
-
-    private void updateTokenInProperties(String newAccessToken) {
-        try {
-            InputStream input = new FileInputStream("src/main/resources/config.properties");
-            Properties prop = new Properties();
-            prop.load(input);
-            prop.setProperty("accessTokenSpotify", newAccessToken);
-        } catch (IOException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
-    }
-
-    public String getDeviceId() {
-        return deviceId;
-    }
-
-    public SpotifyApi getSpotifyApi() {
-        return spotifyApi;
     }
 }

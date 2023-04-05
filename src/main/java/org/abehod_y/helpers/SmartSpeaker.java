@@ -1,5 +1,6 @@
 package org.abehod_y.helpers;
 
+import ai.picovoice.picovoice.PicovoiceException;
 import org.abehod_y.picovoice.PicovoiceRunner;
 import org.abehod_y.spotify.SpotifyPlayer;
 
@@ -33,7 +34,7 @@ public class SmartSpeaker {
             return this;
         }
 
-        public PicovoiceRunner build() {
+        public PicovoiceRunner build() throws PicovoiceException {
             return new PicovoiceRunner(this.picovoiceAccessKey, this.porcupineKeywordPath, this.rhinoContextPath, this.spotifyPlayer);
         }
     }
