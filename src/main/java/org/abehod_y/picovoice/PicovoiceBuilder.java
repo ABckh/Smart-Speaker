@@ -1,17 +1,20 @@
 package org.abehod_y.picovoice;
 
+import ai.picovoice.cheetah.Cheetah;
+import ai.picovoice.cheetah.CheetahTranscript;
 import ai.picovoice.picovoice.Picovoice;
 import ai.picovoice.picovoice.PicovoiceException;
 import ai.picovoice.picovoice.PicovoiceInferenceCallback;
-import ai.picovoice.picovoice.PicovoiceWakeWordCallback;
+import org.abehod_y.helpers.Microphone;
 import org.abehod_y.spotify.SpotifyPlayer;
 
-import javax.sound.sampled.*;
 import java.util.Map;
+
 
 public class PicovoiceBuilder {
     private Picovoice picovoice;
     private String accessKey;
+    private Microphone microphone;
 
     PicovoiceBuilder(String accessKey, String keywordPath, String contextPath, SpotifyPlayer spotifyPlayer) {
         try {
@@ -19,7 +22,7 @@ public class PicovoiceBuilder {
             this.picovoice = new Picovoice.Builder()
                     .setAccessKey(accessKey)
                     .setKeywordPath(keywordPath)
-                    .setWakeWordCallback(getWakeWordCallback())
+                    .setWakeWordCallback(() -> System.out.println("Wake word detected!"))
                     .setContextPath(contextPath)
                     .setInferenceCallback(getInferenceCallback(spotifyPlayer))
                     .build();
@@ -28,10 +31,12 @@ public class PicovoiceBuilder {
         }
     }
 
-    private PicovoiceWakeWordCallback getWakeWordCallback() {
-        return () -> {
-            System.out.println("Wake word detected!");
-        };
+    public void setMicrophone(Microphone microphone) {
+        this.microphone = microphone;
+    }
+
+    public Picovoice getPicovoice() {
+        return picovoice;
     }
 
     private PicovoiceInferenceCallback getInferenceCallback(SpotifyPlayer player) {
@@ -89,7 +94,7 @@ public class PicovoiceBuilder {
                     }
                     case "PlayConcreteSongOrAlbum" -> {
                         if (slots.containsKey("item")) {
-                            String query = CheetahRunner.getSearchQuery(accessKey);
+                            String query = getSearchQuery();
                             if (slots.get("item").equals("song")) {
                                 player.playTrackByQuery(query);
                             } else {
@@ -102,20 +107,43 @@ public class PicovoiceBuilder {
             }
         };
     }
-    static TargetDataLine getMicDataLine() {
-        AudioFormat format = new AudioFormat(16000f, 16,
-                1, true, false);
-        DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, format);
-        TargetDataLine micDataLine = null;
+
+    private String getSearchQuery() {
+        Cheetah cheetah = null;
+        String searchQuery = "";
         try {
-            micDataLine = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
-            micDataLine.open(format);
-        } catch (LineUnavailableException e) {
-            System.err.println("Failed to get a valid audio capture device.");
+            cheetah = new Cheetah.Builder()
+                    .setAccessKey(accessKey)
+                    .build();
+
+
+            short[] cheetahBuffer = microphone.getObjectBuffer();
+            long start = System.currentTimeMillis();
+            long end = start + 7 * 1000;
+
+            System.out.println("Now listening...");
+
+            while (System.currentTimeMillis() < end) {
+
+                microphone.readBuffer();
+
+                // process with cheetah
+                CheetahTranscript transcriptObj = cheetah.process(cheetahBuffer);
+                searchQuery += transcriptObj.getTranscript();
+                if (transcriptObj.getIsEndpoint()) {
+                    CheetahTranscript endpointTranscriptObj = cheetah.flush();
+                    searchQuery += endpointTranscriptObj.getTranscript();
+                }
+                System.out.flush();
+            }
+            System.out.println("Stopping...");
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        } finally {
+            if (cheetah != null) {
+                cheetah.delete();
+            }
         }
-        return micDataLine;
-    }
-    public Picovoice getPicovoice() {
-        return picovoice;
+        return searchQuery;
     }
 }
