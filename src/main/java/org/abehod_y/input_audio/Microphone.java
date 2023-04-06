@@ -1,4 +1,4 @@
-package org.abehod_y.helpers;
+package org.abehod_y.input_audio;
 
 import javax.sound.sampled.*;
 import java.nio.ByteBuffer;

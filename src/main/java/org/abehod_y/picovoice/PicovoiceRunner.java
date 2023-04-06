@@ -1,29 +1,57 @@
 package org.abehod_y.picovoice;
 
+import ai.picovoice.cheetah.Cheetah;
+import ai.picovoice.cheetah.CheetahException;
+import ai.picovoice.cheetah.CheetahTranscript;
 import ai.picovoice.picovoice.PicovoiceException;
-import org.abehod_y.helpers.Microphone;
-import org.abehod_y.spotify.SpotifyPlayer;
+import org.abehod_y.input_audio.Microphone;
 
 
 public class PicovoiceRunner extends PicovoiceBuilder {
 
-    public PicovoiceRunner(String accessKey, String keywordPath, String contextPath, SpotifyPlayer spotifyPlayer) throws PicovoiceException {
-        super(accessKey, keywordPath, contextPath, spotifyPlayer);
+    private Microphone microphone;
+
+    public PicovoiceRunner(String accessKey, String keywordPath, String contextPath) throws PicovoiceException, CheetahException {
+        super(accessKey, keywordPath, contextPath);
     }
 
-    public void run() {
+    public void run() throws PicovoiceException {
         int frameLength = this.getPicovoice().getFrameLength();
-        Microphone microphone = new Microphone(frameLength);
+        microphone = new Microphone(frameLength);
         short[] picovoiceBuffer = microphone.getObjectBuffer();
-        this.setMicrophone(microphone);
 
         while (true) {
             microphone.readBuffer();
-            try {
-                this.getPicovoice().process(picovoiceBuffer);
-            } catch (PicovoiceException e) {
-                System.out.println("Error: " + e.getMessage());
-            }
+            this.getPicovoice().process(picovoiceBuffer);
         }
+    }
+
+    public String getSearchQueryWithCheetah() throws CheetahException {
+        Cheetah cheetah = this.getCheetah();
+        StringBuilder searchQuery = new StringBuilder();
+
+        short[] cheetahBuffer = microphone.getObjectBuffer();
+        long start = System.currentTimeMillis();
+        long end = start + 7 * 1000;
+
+        System.out.println("Now listening...");
+
+        while (System.currentTimeMillis() < end) {
+            microphone.readBuffer();
+
+            // process with cheetah
+            CheetahTranscript transcriptObj = cheetah.process(cheetahBuffer);
+            searchQuery.append(transcriptObj.getTranscript());
+            if (transcriptObj.getIsEndpoint()) {
+                CheetahTranscript endpointTranscriptObj = cheetah.flush();
+                searchQuery.append(endpointTranscriptObj.getTranscript());
+            }
+            System.out.flush();
+        }
+        System.out.println("Stopping...");
+        if (cheetah != null) {
+            cheetah.delete();
+        }
+        return searchQuery.toString();
     }
 }

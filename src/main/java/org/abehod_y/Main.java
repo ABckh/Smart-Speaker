@@ -1,8 +1,7 @@
 package org.abehod_y;
 
+import ai.picovoice.cheetah.CheetahException;
 import ai.picovoice.picovoice.PicovoiceException;
-import org.abehod_y.helpers.SmartSpeaker;
-import org.abehod_y.spotify.SpotifyPlayer;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -10,7 +9,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class Main {
-    public static void main(String[] args) throws IOException, PicovoiceException {
+    public static void main(String[] args) throws IOException, PicovoiceException, CheetahException {
         InputStream input = new FileInputStream("src/main/resources/config.properties");
         Properties prop = new Properties();
         prop.load(input);
@@ -20,9 +19,6 @@ public class Main {
         String deviceId = prop.getProperty("spotifyDeviceId");
         String refreshToken = prop.getProperty("spotifyRefreshToken");
 
-        SpotifyPlayer spotifyPlayer = new SpotifyPlayer(clientId, clientSecret,
-                deviceId, refreshToken);
-
         String picovoiceAccessKey = prop.getProperty("picovoiceAccessKey");
         String porcupineKeywordPath = prop.getProperty("porcupineKeywordPath");
         String rhinoContextPath = prop.getProperty("rhinoContextPath");
@@ -31,7 +27,10 @@ public class Main {
                 .setPicovoiceAccessKey(picovoiceAccessKey)
                 .setPorcupineKeywordPath(porcupineKeywordPath)
                 .setRhinoContextPath(rhinoContextPath)
-                .setSpotifyPlayer(spotifyPlayer)
+                .setSpotifyClientId(clientId)
+                .setSpotifyClientSecret(clientSecret)
+                .setSpotifyDeviceId(deviceId)
+                .setSpotifyRefreshToken(refreshToken)
                 .build()
                 .run();
 

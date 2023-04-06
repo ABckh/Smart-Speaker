@@ -6,7 +6,6 @@ import se.michaelthelin.spotify.model_objects.specification.*;
 import se.michaelthelin.spotify.requests.data.library.GetUsersSavedTracksRequest;
 import se.michaelthelin.spotify.requests.data.library.RemoveUsersSavedTracksRequest;
 import se.michaelthelin.spotify.requests.data.library.SaveTracksForUserRequest;
-import se.michaelthelin.spotify.requests.data.search.simplified.SearchPlaylistsRequest;
 
 import java.io.IOException;
 
@@ -26,29 +25,18 @@ public class SpotifyLibrary extends SpotifyBuilder {
         return getUsersSavedTracksRequest.execute().getItems();
     }
 
-    public void saveTrackToLiked(String trackId) throws IOException, ParseException, SpotifyWebApiException {
+    void saveTrackToLiked(String trackId) throws IOException, ParseException, SpotifyWebApiException {
         SaveTracksForUserRequest saveTracksForUserRequest = this.getSpotifyApi()
                 .saveTracksForUser(trackId)
                 .build();
         saveTracksForUserRequest.execute();
     }
 
-    public void removeTrackFromLiked(String trackId) throws IOException, ParseException, SpotifyWebApiException {
+    void removeTrackFromLiked(String trackId) throws IOException, ParseException, SpotifyWebApiException {
         RemoveUsersSavedTracksRequest removeUsersSavedTracksRequest = this.getSpotifyApi()
                 .removeUsersSavedTracks(trackId)
                 .build();
         removeUsersSavedTracksRequest.execute();
     }
 
-    String getReleaseRadarPlaylistId() throws IOException, ParseException, SpotifyWebApiException {
-        final SearchPlaylistsRequest searchPlaylistRequest = this.getSpotifyApi()
-                .searchPlaylists("Release Radar")
-                .build();
-
-        PlaylistSimplified[] playlists = searchPlaylistRequest
-                .execute()
-                .getItems();
-
-         return playlists[0].getId();
-    }
 }

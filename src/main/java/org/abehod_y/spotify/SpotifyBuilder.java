@@ -13,7 +13,7 @@ public class SpotifyBuilder {
     private final String deviceId;
     private final SpotifyApi spotifyApi;
 
-    public SpotifyBuilder(String clientId, String clientSecret,
+    SpotifyBuilder(String clientId, String clientSecret,
                           String deviceId, String refreshToken) {
         this.deviceId = deviceId;
         this.spotifyApi = new SpotifyApi.Builder()
@@ -24,15 +24,15 @@ public class SpotifyBuilder {
         this.updateToken();
     }
 
-    public String getDeviceId() {
+    String getDeviceId() {
         return deviceId;
     }
 
-    public SpotifyApi getSpotifyApi() {
+    SpotifyApi getSpotifyApi() {
         return spotifyApi;
     }
 
-    public void updateToken() {
+    void updateToken() {
         Timer timer = new Timer();
         TimerTask hourlyTask = new TimerTask() {
             @Override

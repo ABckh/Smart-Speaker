@@ -17,6 +17,7 @@ import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistsItemsRequest
 import se.michaelthelin.spotify.requests.data.search.SearchItemRequest;
 import se.michaelthelin.spotify.requests.data.search.simplified.SearchAlbumsRequest;
 import se.michaelthelin.spotify.requests.data.search.simplified.SearchArtistsRequest;
+import se.michaelthelin.spotify.requests.data.search.simplified.SearchPlaylistsRequest;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -232,5 +233,17 @@ public class SpotifyPlayer extends SpotifyLibrary {
         final Paging<Artist> artistPaging = searchArtistsRequest.execute();
         Artist artist = artistPaging.getItems()[0];
         return artist.getId();
+    }
+
+    private String getReleaseRadarPlaylistId() throws IOException, ParseException, SpotifyWebApiException {
+        final SearchPlaylistsRequest searchPlaylistRequest = this.getSpotifyApi()
+                .searchPlaylists("Release Radar")
+                .build();
+
+        PlaylistSimplified[] playlists = searchPlaylistRequest
+                .execute()
+                .getItems();
+
+        return playlists[0].getId();
     }
 }
