@@ -49,27 +49,12 @@ public class PicovoiceBuilder {
                 final String intent = inference.getIntent();
                 final Map<String, String> slots = inference.getSlots();
                 try {
-                    runTaskFromIntent(intent, slots);
+                    spotifyRunner.setSlots(slots);
+                    spotifyRunner.runTaskFromIntent(intent);
                 } catch (IOException | ParseException | SpotifyWebApiException | CheetahException e) {
                     System.out.println("Error: " + e.getMessage());
                 }
             }
         };
-    }
-
-    private void runTaskFromIntent(String intent, Map<String, String> slots) throws IOException, ParseException, SpotifyWebApiException, CheetahException {
-        assert spotifyRunner != null;
-        spotifyRunner.setSlots(slots);
-        switch (intent) {
-            case "PlaySomeMusic" -> spotifyRunner.playSomeMusic();
-            case "Pause" -> spotifyRunner.pausePlayback();
-            case "Resume" -> spotifyRunner.resumePlayback();
-            case "ChangeTrack" -> spotifyRunner.changeTrack();
-            case "AddRemoveTrack" -> spotifyRunner.addRemoveTrack();
-            case "SetVolume" -> spotifyRunner.setVolume();
-            case "PlayByArtist" -> spotifyRunner.playByArtist();
-            case "PlayNewMusic" -> spotifyRunner.playNewMusic();
-            case "PlayConcreteSongOrAlbum" -> spotifyRunner.playConcreteSongOrAlbum();
-        }
     }
 }

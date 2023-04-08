@@ -5,7 +5,6 @@ import com.neovisionaries.i18n.CountryCode;
 import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.enums.ModelObjectType;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
-import se.michaelthelin.spotify.model_objects.miscellaneous.CurrentlyPlaying;
 import se.michaelthelin.spotify.model_objects.specification.*;
 import se.michaelthelin.spotify.requests.data.albums.GetAlbumsTracksRequest;
 import se.michaelthelin.spotify.requests.data.artists.GetArtistsAlbumsRequest;
@@ -16,13 +15,13 @@ import se.michaelthelin.spotify.requests.data.player.*;
 import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistsItemsRequest;
 import se.michaelthelin.spotify.requests.data.search.SearchItemRequest;
 import se.michaelthelin.spotify.requests.data.search.simplified.SearchAlbumsRequest;
-import se.michaelthelin.spotify.requests.data.search.simplified.SearchArtistsRequest;
-import se.michaelthelin.spotify.requests.data.search.simplified.SearchPlaylistsRequest;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import static org.abehod_y.spotify.helpers.SpotifyIds.*;
 
 
 public class SpotifyPlayer extends SpotifyLibrary {
@@ -101,7 +100,7 @@ public class SpotifyPlayer extends SpotifyLibrary {
 
     public void playTracksByArtist(String artistName) throws IOException, ParseException, SpotifyWebApiException {
         final GetArtistsTopTracksRequest getArtistsTopTracksRequest = this.getSpotifyApi()
-                .getArtistsTopTracks(getArtistId(artistName), CountryCode.LT)
+                .getArtistsTopTracks(getArtistId(this.getSpotifyApi(), artistName), CountryCode.LT)
                 .build();
 
         List<Track> tracks = Arrays.asList(getArtistsTopTracksRequest.execute());
@@ -117,7 +116,7 @@ public class SpotifyPlayer extends SpotifyLibrary {
 
     public void playAlbumByArtist(String artistName) throws IOException, ParseException, SpotifyWebApiException {
         final GetArtistsAlbumsRequest getArtistsAlbumsRequest = this.getSpotifyApi()
-                .getArtistsAlbums(getArtistId(artistName))
+                .getArtistsAlbums(getArtistId(this.getSpotifyApi(), artistName))
                 .build();
         List<AlbumSimplified> albums = Arrays.asList(getArtistsAlbumsRequest.execute().getItems());
         Collections.shuffle(albums);
@@ -165,7 +164,7 @@ public class SpotifyPlayer extends SpotifyLibrary {
     }
 
     public void playNewMusic() throws IOException, ParseException, SpotifyWebApiException {
-        String playlistId = getReleaseRadarPlaylistId();
+        String playlistId = getReleaseRadarPlaylistId(this.getSpotifyApi());
         playPlaylistsTracks(playlistId);
     }
 
@@ -212,38 +211,5 @@ public class SpotifyPlayer extends SpotifyLibrary {
                 .build();
         final AlbumSimplified[] album = searchAlbumsRequest.execute().getItems();
         playAlbumsTracks(album[0].getId());
-    }
-
-    public String getCurrentlyPlayingTrackId() throws IOException, ParseException, SpotifyWebApiException {
-        final GetUsersCurrentlyPlayingTrackRequest getUsersCurrentlyPlayingTrackRequest = this.getSpotifyApi()
-                .getUsersCurrentlyPlayingTrack()
-                .build();
-        final CurrentlyPlaying currentlyPlaying = getUsersCurrentlyPlayingTrackRequest.execute();
-        String trackId = null;
-        if (currentlyPlaying.getIs_playing()) {
-            trackId = currentlyPlaying.getItem().getId();
-        }
-        return trackId;
-    }
-
-    private String getArtistId(String artistName) throws IOException, ParseException, SpotifyWebApiException {
-        final SearchArtistsRequest searchArtistsRequest = this.getSpotifyApi()
-                .searchArtists(artistName)
-                .build();
-        final Paging<Artist> artistPaging = searchArtistsRequest.execute();
-        Artist artist = artistPaging.getItems()[0];
-        return artist.getId();
-    }
-
-    private String getReleaseRadarPlaylistId() throws IOException, ParseException, SpotifyWebApiException {
-        final SearchPlaylistsRequest searchPlaylistRequest = this.getSpotifyApi()
-                .searchPlaylists("Release Radar")
-                .build();
-
-        PlaylistSimplified[] playlists = searchPlaylistRequest
-                .execute()
-                .getItems();
-
-        return playlists[0].getId();
     }
 }

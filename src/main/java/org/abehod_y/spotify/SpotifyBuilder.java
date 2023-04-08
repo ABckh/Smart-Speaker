@@ -13,7 +13,7 @@ public class SpotifyBuilder {
     private final String deviceId;
     private final SpotifyApi spotifyApi;
 
-    SpotifyBuilder(String clientId, String clientSecret,
+    protected SpotifyBuilder(String clientId, String clientSecret,
                           String deviceId, String refreshToken) {
         this.deviceId = deviceId;
         this.spotifyApi = new SpotifyApi.Builder()

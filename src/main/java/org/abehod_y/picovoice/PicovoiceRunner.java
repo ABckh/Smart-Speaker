@@ -32,7 +32,7 @@ public class PicovoiceRunner extends PicovoiceBuilder {
 
         short[] cheetahBuffer = microphone.getObjectBuffer();
         long start = System.currentTimeMillis();
-        long end = start + 7 * 1000;
+        long end = start + 7_000; // 7 seconds
 
         System.out.println("Now listening...");
 
@@ -43,8 +43,7 @@ public class PicovoiceRunner extends PicovoiceBuilder {
             CheetahTranscript transcriptObj = cheetah.process(cheetahBuffer);
             searchQuery.append(transcriptObj.getTranscript());
             if (transcriptObj.getIsEndpoint()) {
-                CheetahTranscript endpointTranscriptObj = cheetah.flush();
-                searchQuery.append(endpointTranscriptObj.getTranscript());
+                searchQuery.append(cheetah.flush().getTranscript());
             }
             System.out.flush();
         }
