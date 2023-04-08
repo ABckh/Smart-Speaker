@@ -1,4 +1,4 @@
-package org.abehod_y.spotify.helpers;
+package org.abehod_y.spotify.spotify_api.helpers;
 
 import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.SpotifyApi;

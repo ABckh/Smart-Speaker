@@ -1,4 +1,4 @@
-package org.abehod_y.spotify;
+package org.abehod_y.spotify.spotify_api;
 
 import com.google.gson.JsonParser;
 import com.neovisionaries.i18n.CountryCode;
@@ -21,7 +21,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.abehod_y.spotify.helpers.SpotifyIds.*;
+import static org.abehod_y.spotify.spotify_api.helpers.SpotifyIds.*;
 
 
 public class SpotifyPlayer extends SpotifyLibrary {
@@ -41,6 +41,11 @@ public class SpotifyPlayer extends SpotifyLibrary {
                 addTrackToQueue(track.getTrack().getUri());
             }
         }
+    }
+
+    public void playNewMusic() throws IOException, ParseException, SpotifyWebApiException {
+        String playlistId = getReleaseRadarPlaylistId(this.getSpotifyApi());
+        playPlaylistsTracks(playlistId);
     }
 
     public void playRecommendations(String genre) throws IOException, ParseException, SpotifyWebApiException {
@@ -148,26 +153,6 @@ public class SpotifyPlayer extends SpotifyLibrary {
         }
     }
 
-    public void playTrack(String trackId) throws IOException, ParseException, SpotifyWebApiException {
-        StartResumeUsersPlaybackRequest playRequest = this.getSpotifyApi().startResumeUsersPlayback()
-                .uris(JsonParser.parseString("[\"spotify:track:" + trackId + "\"]").getAsJsonArray())
-                .device_id(this.getDeviceId())
-                .build();
-        playRequest.execute();
-    }
-
-    public void addTrackToQueue(String trackUri) throws IOException, ParseException, SpotifyWebApiException {
-        final AddItemToUsersPlaybackQueueRequest addItemToUsersPlaybackQueueRequest = this.getSpotifyApi()
-                .addItemToUsersPlaybackQueue(trackUri)
-                .build();
-        addItemToUsersPlaybackQueueRequest.execute();
-    }
-
-    public void playNewMusic() throws IOException, ParseException, SpotifyWebApiException {
-        String playlistId = getReleaseRadarPlaylistId(this.getSpotifyApi());
-        playPlaylistsTracks(playlistId);
-    }
-
     private void playPlaylistsTracks(String playlistId) throws IOException, ParseException, SpotifyWebApiException {
         final GetPlaylistsItemsRequest getPlaylistsItemsRequest = this.getSpotifyApi()
                 .getPlaylistsItems(playlistId)
@@ -183,6 +168,21 @@ public class SpotifyPlayer extends SpotifyLibrary {
                 addTrackToQueue(track.getTrack().getUri());
             }
         }
+    }
+
+    public void playTrack(String trackId) throws IOException, ParseException, SpotifyWebApiException {
+        StartResumeUsersPlaybackRequest playRequest = this.getSpotifyApi().startResumeUsersPlayback()
+                .uris(JsonParser.parseString("[\"spotify:track:" + trackId + "\"]").getAsJsonArray())
+                .device_id(this.getDeviceId())
+                .build();
+        playRequest.execute();
+    }
+
+    public void addTrackToQueue(String trackUri) throws IOException, ParseException, SpotifyWebApiException {
+        final AddItemToUsersPlaybackQueueRequest addItemToUsersPlaybackQueueRequest = this.getSpotifyApi()
+                .addItemToUsersPlaybackQueue(trackUri)
+                .build();
+        addItemToUsersPlaybackQueueRequest.execute();
     }
 
     public void playSomeAlbum() throws IOException, ParseException, SpotifyWebApiException {

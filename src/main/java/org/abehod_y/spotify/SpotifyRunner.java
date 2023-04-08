@@ -2,13 +2,14 @@ package org.abehod_y.spotify;
 
 import ai.picovoice.cheetah.CheetahException;
 import org.abehod_y.picovoice.PicovoiceRunner;
+import org.abehod_y.spotify.spotify_api.SpotifyPlayer;
 import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 
 import java.io.IOException;
 import java.util.Map;
 
-import static org.abehod_y.spotify.helpers.SpotifyIds.getCurrentlyPlayingTrackId;
+import static org.abehod_y.spotify.spotify_api.helpers.SpotifyIds.getCurrentlyPlayingTrackId;
 
 public class SpotifyRunner {
 

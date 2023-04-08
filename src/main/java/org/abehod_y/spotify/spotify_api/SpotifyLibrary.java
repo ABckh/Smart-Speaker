@@ -1,4 +1,4 @@
-package org.abehod_y.spotify;
+package org.abehod_y.spotify.spotify_api;
 
 import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
@@ -25,14 +25,14 @@ public class SpotifyLibrary extends SpotifyBuilder {
         return getUsersSavedTracksRequest.execute().getItems();
     }
 
-    void saveTrackToLiked(String trackId) throws IOException, ParseException, SpotifyWebApiException {
+    public void saveTrackToLiked(String trackId) throws IOException, ParseException, SpotifyWebApiException {
         SaveTracksForUserRequest saveTracksForUserRequest = this.getSpotifyApi()
                 .saveTracksForUser(trackId)
                 .build();
         saveTracksForUserRequest.execute();
     }
 
-    void removeTrackFromLiked(String trackId) throws IOException, ParseException, SpotifyWebApiException {
+    public void removeTrackFromLiked(String trackId) throws IOException, ParseException, SpotifyWebApiException {
         RemoveUsersSavedTracksRequest removeUsersSavedTracksRequest = this.getSpotifyApi()
                 .removeUsersSavedTracks(trackId)
                 .build();

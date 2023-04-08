@@ -1,4 +1,4 @@
-package org.abehod_y.spotify;
+package org.abehod_y.spotify.spotify_api;
 
 import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.SpotifyApi;
@@ -28,7 +28,7 @@ public class SpotifyBuilder {
         return deviceId;
     }
 
-    SpotifyApi getSpotifyApi() {
+    public SpotifyApi getSpotifyApi() {
         return spotifyApi;
     }
 
