@@ -54,7 +54,7 @@ public class SmartSpeaker {
 
         public PicovoiceRunner build() throws PicovoiceException, CheetahException {
             PicovoiceRunner picovoiceRunner = new PicovoiceRunner(this.picovoiceAccessKey, this.porcupineKeywordPath, this.rhinoContextPath);
-            SpotifyRunner spotifyRunner = new SpotifyRunner(this.spotifyClientId, this.spotifyClientSecret, this.spotifyDeviceId, this.spotifyRefreshToken, picovoiceRunner);
+            SpotifyRunner spotifyRunner = new SpotifyRunner(this.spotifyClientId, this.spotifyClientSecret, this.spotifyRefreshToken, this.spotifyDeviceId, picovoiceRunner);
             picovoiceRunner.setSpotifyRunner(spotifyRunner);
             return picovoiceRunner;
         }

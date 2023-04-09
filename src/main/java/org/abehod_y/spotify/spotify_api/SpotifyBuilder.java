@@ -10,22 +10,15 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class SpotifyBuilder {
-    private final String deviceId;
     private final SpotifyApi spotifyApi;
 
-    protected SpotifyBuilder(String clientId, String clientSecret,
-                          String deviceId, String refreshToken) {
-        this.deviceId = deviceId;
+    protected SpotifyBuilder(String clientId, String clientSecret, String refreshToken) {
         this.spotifyApi = new SpotifyApi.Builder()
                 .setClientId(clientId)
                 .setClientSecret(clientSecret)
                 .setRefreshToken(refreshToken)
                 .build();
         this.updateToken();
-    }
-
-    String getDeviceId() {
-        return deviceId;
     }
 
     public SpotifyApi getSpotifyApi() {

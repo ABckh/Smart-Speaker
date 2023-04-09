@@ -9,7 +9,7 @@ import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import java.io.IOException;
 import java.util.Map;
 
-import static org.abehod_y.spotify.spotify_api.helpers.SpotifyIds.getCurrentlyPlayingTrackId;
+import static org.abehod_y.spotify.spotify_api.SpotifyIds.getCurrentlyPlayingTrackId;
 
 public class SpotifyRunner {
 
@@ -45,8 +45,8 @@ public class SpotifyRunner {
         if (slots.containsKey("genre")) {
             spotifyPlayer.playRecommendations(slots.get("genre"));
         } else if (slots.containsKey("item")) {
-            if (slots.get("item").equals("music")) spotifyPlayer.playSomeMusic();
-            else spotifyPlayer.playSomeAlbum();
+            if (slots.get("item").equals("music")) spotifyPlayer.playRandomMusic();
+            else spotifyPlayer.playRandomAlbum();
         }
     }
 
@@ -86,8 +86,8 @@ public class SpotifyRunner {
     private void playByArtist() throws IOException, ParseException, SpotifyWebApiException {
         if (slots.containsKey("type") && slots.containsKey("artist")) {
             System.out.println("Playing music by artist");
-            if (slots.get("type").equals("song")) spotifyPlayer.playTracksByArtist(slots.get("artist"));
-            else spotifyPlayer.playAlbumByArtist(slots.get("artist"));
+            if (slots.get("type").equals("song")) spotifyPlayer.playRandomTracksByArtist(slots.get("artist"));
+            else spotifyPlayer.playRandomAlbumByArtist(slots.get("artist"));
         }
     }
 

@@ -11,9 +11,8 @@ import java.io.IOException;
 
 public class SpotifyLibrary extends SpotifyBuilder {
 
-    SpotifyLibrary(String clientId, String clientSecret, String deviceId,
-             String refreshToken) {
-        super(clientId, clientSecret, deviceId, refreshToken);
+    SpotifyLibrary(String clientId, String clientSecret, String refreshToken) {
+        super(clientId, clientSecret, refreshToken);
     }
 
     SavedTrack[] getUserSavedTracks() throws IOException, ParseException, SpotifyWebApiException {
