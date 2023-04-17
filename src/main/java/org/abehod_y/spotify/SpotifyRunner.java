@@ -9,7 +9,7 @@ import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import java.io.IOException;
 import java.util.Map;
 
-import static org.abehod_y.spotify.spotify_api.SpotifyIds.getCurrentlyPlayingTrackId;
+import static org.abehod_y.spotify.spotify_api.helpers.SpotifyItemsIds.getCurrentlyPlayingTrackId;
 
 public class SpotifyRunner {
 

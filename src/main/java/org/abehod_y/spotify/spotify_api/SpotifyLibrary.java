@@ -1,13 +1,13 @@
 package org.abehod_y.spotify.spotify_api;
 
-import org.apache.hc.core5.http.ParseException;
-import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
-import se.michaelthelin.spotify.model_objects.specification.*;
+import se.michaelthelin.spotify.model_objects.specification.SavedTrack;
 import se.michaelthelin.spotify.requests.data.library.GetUsersSavedTracksRequest;
 import se.michaelthelin.spotify.requests.data.library.RemoveUsersSavedTracksRequest;
 import se.michaelthelin.spotify.requests.data.library.SaveTracksForUserRequest;
 
-import java.io.IOException;
+import java.util.Objects;
+
+import static org.abehod_y.spotify.spotify_api.helpers.Requests.*;
 
 public class SpotifyLibrary extends SpotifyBuilder {
 
@@ -15,27 +15,28 @@ public class SpotifyLibrary extends SpotifyBuilder {
         super(clientId, clientSecret, refreshToken);
     }
 
-    SavedTrack[] getUserSavedTracks() throws IOException, ParseException, SpotifyWebApiException {
+    SavedTrack[] getUserSavedTracks() {
         GetUsersSavedTracksRequest getUsersSavedTracksRequest = this.getSpotifyApi().getUsersSavedTracks()
                 .limit(50)
                 .offset(0)
                 .build();
 
-        return getUsersSavedTracksRequest.execute().getItems();
+        return Objects.requireNonNull(executeRequestWithReturn(getUsersSavedTracksRequest)).getItems();
     }
 
-    public void saveTrackToLiked(String trackId) throws IOException, ParseException, SpotifyWebApiException {
+    public void saveTrackToLiked(String trackId) {
         SaveTracksForUserRequest saveTracksForUserRequest = this.getSpotifyApi()
                 .saveTracksForUser(trackId)
                 .build();
-        saveTracksForUserRequest.execute();
+
+        executeRequest(saveTracksForUserRequest);
     }
 
-    public void removeTrackFromLiked(String trackId) throws IOException, ParseException, SpotifyWebApiException {
+    public void removeTrackFromLiked(String trackId) {
         RemoveUsersSavedTracksRequest removeUsersSavedTracksRequest = this.getSpotifyApi()
                 .removeUsersSavedTracks(trackId)
                 .build();
-        removeUsersSavedTracksRequest.execute();
-    }
 
+        executeRequest(removeUsersSavedTracksRequest);
+    }
 }
