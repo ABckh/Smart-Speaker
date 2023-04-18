@@ -6,10 +6,7 @@ import ai.picovoice.picovoice.Picovoice;
 import ai.picovoice.picovoice.PicovoiceException;
 import ai.picovoice.picovoice.PicovoiceInferenceCallback;
 import org.abehod_y.spotify.SpotifyRunner;
-import org.apache.hc.core5.http.ParseException;
-import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 
-import java.io.IOException;
 import java.util.Map;
 
 
@@ -48,12 +45,8 @@ public class PicovoiceBuilder {
             if (inference.getIsUnderstood()) {
                 final String intent = inference.getIntent();
                 final Map<String, String> slots = inference.getSlots();
-                try {
                     spotifyRunner.setSlots(slots);
                     spotifyRunner.runTaskFromIntent(intent);
-                } catch (IOException | ParseException | SpotifyWebApiException | CheetahException e) {
-                    System.out.println("Error: " + e.getMessage());
-                }
             }
         };
     }

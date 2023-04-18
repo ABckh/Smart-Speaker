@@ -2,10 +2,7 @@ package org.abehod_y.spotify.spotify_api.helpers;
 
 import se.michaelthelin.spotify.model_objects.AbstractModelObject;
 import se.michaelthelin.spotify.model_objects.special.SearchResult;
-import se.michaelthelin.spotify.model_objects.specification.Paging;
-import se.michaelthelin.spotify.model_objects.specification.Recommendations;
-import se.michaelthelin.spotify.model_objects.specification.Track;
-import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;
+import se.michaelthelin.spotify.model_objects.specification.*;
 
 import java.util.Random;
 
@@ -35,4 +32,15 @@ public class ArraysHelpers {
         return searchResult.getTracks().getItems();
     }
 
+    public static <T> T getFirstElement(T[] array) {
+        if (array.length == 0) return null;
+        return array[0];
+    }
+
+    public static AlbumSimplified getFirstAlbumFromArray(AlbumSimplified[] albums) {
+        for (AlbumSimplified album : albums) {
+            if (album.getAlbumType().getType().equals("album")) return album;
+        }
+        return null;
+    }
 }

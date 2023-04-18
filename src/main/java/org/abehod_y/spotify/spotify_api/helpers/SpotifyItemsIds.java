@@ -2,49 +2,65 @@ package org.abehod_y.spotify.spotify_api.helpers;
 
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.model_objects.miscellaneous.CurrentlyPlaying;
-import se.michaelthelin.spotify.model_objects.specification.Artist;
-import se.michaelthelin.spotify.model_objects.specification.Paging;
-import se.michaelthelin.spotify.model_objects.specification.PlaylistSimplified;
+import se.michaelthelin.spotify.model_objects.specification.*;
 import se.michaelthelin.spotify.requests.data.player.GetUsersCurrentlyPlayingTrackRequest;
 import se.michaelthelin.spotify.requests.data.search.simplified.SearchArtistsRequest;
 import se.michaelthelin.spotify.requests.data.search.simplified.SearchPlaylistsRequest;
 
 import java.util.Objects;
 
+import static org.abehod_y.spotify.spotify_api.helpers.ArraysHelpers.getFirstElement;
+import static org.abehod_y.spotify.spotify_api.helpers.ArraysHelpers.getItemsOrNull;
 import static org.abehod_y.spotify.spotify_api.helpers.Requests.*;
 
 public class SpotifyItemsIds {
 
     public static String getCurrentlyPlayingTrackId(SpotifyApi spotifyApi) {
-        final GetUsersCurrentlyPlayingTrackRequest getUsersCurrentlyPlayingTrackRequest = spotifyApi
+        GetUsersCurrentlyPlayingTrackRequest getUsersCurrentlyPlayingTrackRequest = spotifyApi
                 .getUsersCurrentlyPlayingTrack()
                 .build();
-        final CurrentlyPlaying currentlyPlaying = executeRequestWithReturn(getUsersCurrentlyPlayingTrackRequest);
-        String trackId = null;
-        assert currentlyPlaying != null;
-        if (currentlyPlaying.getIs_playing()) {
-            trackId = currentlyPlaying.getItem().getId();
-        }
-        return trackId;
+        CurrentlyPlaying currentlyPlaying = executeRequestWithReturn(getUsersCurrentlyPlayingTrackRequest);
+        if (currentlyPlaying != null && currentlyPlaying.getIs_playing()) return currentlyPlaying.getItem().getId();
+        else return null;
     }
 
     public static String getArtistId(SpotifyApi spotifyApi, String artistName) {
-        final SearchArtistsRequest searchArtistsRequest = spotifyApi
+        SearchArtistsRequest searchArtistsRequest = spotifyApi
                 .searchArtists(artistName)
                 .build();
-        final Paging<Artist> artistPaging = executeRequestWithReturn(searchArtistsRequest);
-        assert artistPaging != null;
-        Artist artist = artistPaging.getItems()[0];
-        return artist.getId();
+        Paging<Artist> artistPaging = executeRequestWithReturn(searchArtistsRequest);
+        Artist artist = getFirstElement(Objects.requireNonNull(getItemsOrNull(artistPaging)));
+        return artist != null ? artist.getId() : null;
     }
 
     public static String getReleaseRadarPlaylistId(SpotifyApi spotifyApi) {
-        final SearchPlaylistsRequest searchPlaylistRequest = spotifyApi
+        SearchPlaylistsRequest searchPlaylistRequest = spotifyApi
                 .searchPlaylists("Release Radar")
                 .build();
-        PlaylistSimplified[] playlists = Objects.requireNonNull(executeRequestWithReturn(searchPlaylistRequest))
-                .getItems();
+        Paging<PlaylistSimplified> playlists = executeRequestWithReturn(searchPlaylistRequest);
+        PlaylistSimplified playlist = getFirstElement(Objects.requireNonNull(getItemsOrNull(playlists)));
+        return playlist != null ? playlist.getId() : null;
+    }
 
-        return playlists[0].getId();
+    public static String extractAlbumId(Object album) {
+        if (album instanceof Track) return ((Track) album).getId();
+        else if (album instanceof TrackSimplified) return ((TrackSimplified) album).getId();
+        return null;
+    }
+
+    public static String getIdFromTrack(Object track) {
+        if (track instanceof Track) return ((Track) track).getId();
+        else if (track instanceof TrackSimplified) return ((TrackSimplified) track).getId();
+        else if (track instanceof SavedTrack) return ((SavedTrack) track).getTrack().getId();
+        else if (track instanceof PlaylistTrack) return ((PlaylistTrack) track).getTrack().getId();
+        return null;
+    }
+
+    public static String getUriFromTrack(Object track) {
+        if (track instanceof Track) return ((Track) track).getUri();
+        else if (track instanceof TrackSimplified) return ((TrackSimplified) track).getUri();
+        else if (track instanceof SavedTrack) return ((SavedTrack) track).getTrack().getUri();
+        else if (track instanceof PlaylistTrack) return ((PlaylistTrack) track).getTrack().getUri();
+        return null;
     }
 }

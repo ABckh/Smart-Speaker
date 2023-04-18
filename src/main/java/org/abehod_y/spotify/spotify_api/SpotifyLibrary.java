@@ -21,6 +21,7 @@ import static org.abehod_y.spotify.spotify_api.helpers.Requests.*;
 import static org.abehod_y.spotify.spotify_api.helpers.SpotifyItemsIds.getArtistId;
 
 public class SpotifyLibrary extends SpotifyBuilder {
+    private static final int LIMIT = 50;
 
     SpotifyLibrary(String clientId, String clientSecret, String refreshToken) {
         super(clientId, clientSecret, refreshToken);
@@ -28,7 +29,7 @@ public class SpotifyLibrary extends SpotifyBuilder {
 
     SavedTrack[] getUserSavedTracks() {
         GetUsersSavedTracksRequest getUsersSavedTracksRequest = this.getSpotifyApi().getUsersSavedTracks()
-                .limit(50)
+                .limit(LIMIT)
                 .offset(0)
                 .build();
 
@@ -74,17 +75,17 @@ public class SpotifyLibrary extends SpotifyBuilder {
         return getItemsOrNull(albums);
     }
 
-    public TrackSimplified[] getTracksFromAlbum(String albumId) {
+    TrackSimplified[] getTracksFromAlbum(String albumId) {
         GetAlbumsTracksRequest getAlbumsTracksRequest = this.getSpotifyApi()
                 .getAlbumsTracks(albumId)
-                .limit(50)
+                .limit(LIMIT)
                 .build();
 
         Paging<TrackSimplified> tracks = executeRequestWithReturn(getAlbumsTracksRequest);
         return getItemsOrNull(tracks);
     }
 
-    public PlaylistTrack[] getTracksFromPlaylist(String playlistId) {
+    PlaylistTrack[] getTracksFromPlaylist(String playlistId) {
         GetPlaylistsItemsRequest getPlaylistsItemsRequest = this.getSpotifyApi()
                 .getPlaylistsItems(playlistId)
                 .build();
@@ -93,7 +94,7 @@ public class SpotifyLibrary extends SpotifyBuilder {
         return getItemsOrNull(tracks);
     }
 
-    public Track[] getTrackByQuery(String query) {
+    Track[] getTrackByQuery(String query) {
         SearchItemRequest searchItemRequest = this.getSpotifyApi()
                 .searchItem(query, ModelObjectType.TRACK.getType())
                 .build();
@@ -102,7 +103,7 @@ public class SpotifyLibrary extends SpotifyBuilder {
         return getItemsOrNull(tracks);
     }
 
-    public AlbumSimplified[] getAlbumByQuery(String query) {
+    AlbumSimplified[] getAlbumByQuery(String query) {
         SearchAlbumsRequest searchAlbumsRequest = this.getSpotifyApi()
                 .searchAlbums(query)
                 .build();

@@ -48,9 +48,6 @@ public class PicovoiceRunner extends PicovoiceBuilder {
             System.out.flush();
         }
         System.out.println("Stopping...");
-        if (cheetah != null) {
-            cheetah.delete();
-        }
         return searchQuery.toString();
     }
 }

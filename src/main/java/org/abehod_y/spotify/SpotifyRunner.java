@@ -3,16 +3,12 @@ package org.abehod_y.spotify;
 import ai.picovoice.cheetah.CheetahException;
 import org.abehod_y.picovoice.PicovoiceRunner;
 import org.abehod_y.spotify.spotify_api.SpotifyPlayer;
-import org.apache.hc.core5.http.ParseException;
-import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 
-import java.io.IOException;
 import java.util.Map;
 
 import static org.abehod_y.spotify.spotify_api.helpers.SpotifyItemsIds.getCurrentlyPlayingTrackId;
 
 public class SpotifyRunner {
-
     private Map<String, String> slots;
     private final PicovoiceRunner picovoiceRunner;
     private final SpotifyPlayer spotifyPlayer;
@@ -26,7 +22,7 @@ public class SpotifyRunner {
         this.slots = slots;
     }
 
-    public void runTaskFromIntent(String intent) throws IOException, ParseException, SpotifyWebApiException, CheetahException {
+    public void runTaskFromIntent(String intent) {
         switch (intent) {
             case "PlaySomeMusic" -> this.playSomeMusic();
             case "Pause" -> this.pausePlayback();
@@ -40,7 +36,7 @@ public class SpotifyRunner {
         }
     }
 
-    private void playSomeMusic() throws IOException, ParseException, SpotifyWebApiException {
+    private void playSomeMusic() {
         System.out.println("Playing music on spotify");
         if (slots.containsKey("genre")) {
             spotifyPlayer.playRecommendations(slots.get("genre"));
@@ -50,17 +46,17 @@ public class SpotifyRunner {
         }
     }
 
-    private void pausePlayback() throws IOException, ParseException, SpotifyWebApiException {
+    private void pausePlayback() {
         System.out.println("Stopping...");
         spotifyPlayer.pausePlaying();
     }
 
-    private void resumePlayback() throws IOException, ParseException, SpotifyWebApiException {
+    private void resumePlayback() {
         System.out.println("Resuming...");
         spotifyPlayer.resumePlaying();
     }
 
-    private void changeTrack() throws IOException, ParseException, SpotifyWebApiException {
+    private void changeTrack() {
         if (slots.containsKey("pointer")) {
             System.out.println("Changing track...");
             if (slots.get("pointer").equals("next")) spotifyPlayer.nextTrack();
@@ -68,7 +64,7 @@ public class SpotifyRunner {
         }
     }
 
-    private void addRemoveTrack() throws IOException, ParseException, SpotifyWebApiException {
+    private void addRemoveTrack()  {
         if (slots.containsKey("action")) {
             System.out.println("Added or Removed track");
             String currentlyPlayingTrackId = getCurrentlyPlayingTrackId(spotifyPlayer.getSpotifyApi());
@@ -77,13 +73,13 @@ public class SpotifyRunner {
         }
     }
 
-    private void setVolume() throws IOException, ParseException, SpotifyWebApiException {
+    private void setVolume()  {
         System.out.println("Setting volume...");
         if (slots.containsKey("volume")) spotifyPlayer.setVolume(Integer.parseInt(slots.get("volume")));
         else spotifyPlayer.setVolume(100);
     }
 
-    private void playByArtist() throws IOException, ParseException, SpotifyWebApiException {
+    private void playByArtist()  {
         if (slots.containsKey("type") && slots.containsKey("artist")) {
             System.out.println("Playing music by artist");
             if (slots.get("type").equals("song")) spotifyPlayer.playRandomTracksByArtist(slots.get("artist"));
@@ -91,17 +87,21 @@ public class SpotifyRunner {
         }
     }
 
-    private void playNewMusic() throws IOException, ParseException, SpotifyWebApiException {
+    private void playNewMusic()  {
         System.out.println("Playing new music");
         spotifyPlayer.playNewMusic();
     }
 
-    private void playConcreteSongOrAlbum() throws IOException, ParseException, SpotifyWebApiException, CheetahException {
-        String query = picovoiceRunner.getSearchQueryWithCheetah();
-        if (slots.containsKey("item")) {
-            if (slots.get("item").equals("song")) spotifyPlayer.playTrackByQuery(query);
-            else spotifyPlayer.playAlbumByQuery(query);
-            System.out.println("Playing " + query);
+    private void playConcreteSongOrAlbum() {
+        try {
+            String query = picovoiceRunner.getSearchQueryWithCheetah();
+            if (slots.containsKey("item")) {
+                if (slots.get("item").equals("song")) spotifyPlayer.playTrackByQuery(query);
+                else spotifyPlayer.playAlbumByQuery(query);
+                System.out.println("Playing " + query);
+            }
+        } catch (CheetahException e) {
+            throw new RuntimeException(e);
         }
     }
 }

@@ -4,7 +4,7 @@ import com.google.gson.JsonParser;
 import se.michaelthelin.spotify.model_objects.specification.*;
 import se.michaelthelin.spotify.requests.data.player.*;
 
-import static org.abehod_y.spotify.spotify_api.helpers.ArraysHelpers.shuffle;
+import static org.abehod_y.spotify.spotify_api.helpers.ArraysHelpers.*;
 import static org.abehod_y.spotify.spotify_api.helpers.SpotifyItemsIds.*;
 import static org.abehod_y.spotify.spotify_api.helpers.Requests.*;
 
@@ -20,22 +20,14 @@ public class SpotifyPlayer extends SpotifyLibrary {
     public void playRandomMusic() {
         SavedTrack[] savedTracks = getUserSavedTracks();
         shuffle(savedTracks);
-
-        if (savedTracks.length > 0) {
-            playTrack(savedTracks[0].getTrack().getId());
-            for (int i = 1; i < savedTracks.length; i++) {
-                addTrackToQueue(savedTracks[i].getTrack().getUri());
-            }
-        }
+        playMultipleTracksInARow(savedTracks);
     }
 
     public void playRandomAlbum() {
         SavedAlbum[] savedAlbums = getUsersSavedAlbums();
         shuffle(savedAlbums);
-
-        if (savedAlbums.length > 0) {
-            playAlbumTracks(savedAlbums[0].getAlbum());
-        }
+        SavedAlbum album = getFirstElement(savedAlbums);
+        playAlbumTracks(album);
     }
 
     public void playNewMusic() {
@@ -47,87 +39,57 @@ public class SpotifyPlayer extends SpotifyLibrary {
         genre = genre.replace(" ", "-");
         TrackSimplified[] tracks = getUsersRecommendations(genre);
         shuffle(tracks);
-
-        if (tracks.length > 0) {
-            playTrack(tracks[0].getId());
-            for (int i = 1; i < tracks.length; i++) {
-                addTrackToQueue(tracks[i].getUri());
-            }
-        }
+        playMultipleTracksInARow(tracks);
     }
 
     public void playRandomTracksByArtist(String artistName) {
         Track[] tracks = getTracksByArtist(artistName);
-
-        if (tracks.length > 0) {
-            playTrack(tracks[0].getId());
-            for (int i = 1; i < tracks.length; i++) {
-                addTrackToQueue(tracks[i].getUri());
-            }
-        }
+        playMultipleTracksInARow(tracks);
     }
 
     public void playRandomAlbumByArtist(String artistName) {
         AlbumSimplified[] albums = getAlbumsByArtist(artistName);
         shuffle(albums);
-
-        for (AlbumSimplified album : albums) {
-            if (album.getAlbumType().getType().equals("album")) {
-                playAlbumTracks(album);
-                return;
-            }
-        }
+        playAlbumTracks(getFirstAlbumFromArray(albums));
     }
 
     public void playTrackByQuery(String query) {
         if (query.isEmpty()) return;
-        Track[] foundTracks = getTrackByQuery(query);
 
-        if (foundTracks.length > 0) {
-            playTrack(foundTracks[0].getId());
-        }
+        Track[] foundTracks = getTrackByQuery(query);
+        Track track = getFirstElement(foundTracks);
+        if (track!= null) playTrack(track.getId());
     }
 
     public void playAlbumByQuery(String query) {
         if (query.isEmpty()) return;
+
         AlbumSimplified[] foundAlbums = getAlbumByQuery(query);
-
-        if (foundAlbums.length > 0) {
-            playAlbumTracks(foundAlbums[0].getId());
-        }
+        AlbumSimplified album = getFirstElement(foundAlbums);
+        if (album!= null) playAlbumTracks(album.getId());
     }
 
-    private void playAlbumTracks(AlbumSimplified album) {
-        playAlbumTracks(album.getId());
-    }
-
-    private void playAlbumTracks(Album album) {
-        playAlbumTracks(album.getId());
-    }
-
-    private void playAlbumTracks(String albumId) {
+    private void playAlbumTracks(Object album) {
+        String albumId = extractAlbumId(album);
         TrackSimplified[] tracks = getTracksFromAlbum(albumId);
-        if (tracks.length > 0) {
-            playTrack(tracks[0].getId());
-
-            for (int i = 1; i < tracks.length; i++) {
-                addTrackToQueue(tracks[i].getUri());
-            }
-        }
+        playMultipleTracksInARow(tracks);
     }
 
     private void playPlaylistsTracks(String playlistId) {
         PlaylistTrack[] tracks = getTracksFromPlaylist(playlistId);
-        if (tracks.length > 0) {
-            playTrack(tracks[0].getTrack().getId());
+        playMultipleTracksInARow(tracks);
+    }
 
-            for (int i = 1; i < tracks.length; i++) {
-                addTrackToQueue(tracks[i].getTrack().getUri());
-            }
+    private void playMultipleTracksInARow(Object[] tracks) {
+        if (tracks.length == 0) return;
+
+        playTrack(getIdFromTrack(tracks[0]));
+        for (int i = 1; i < tracks.length; i++) {
+            addTrackToQueue(getUriFromTrack(tracks[i]));
         }
     }
 
-    public void playTrack(String trackId) {
+    private void playTrack(String trackId) {
         StartResumeUsersPlaybackRequest playRequest = this.getSpotifyApi().startResumeUsersPlayback()
                 .uris(JsonParser.parseString("[\"spotify:track:" + trackId + "\"]").getAsJsonArray())
                 .device_id(deviceId)
@@ -135,8 +97,8 @@ public class SpotifyPlayer extends SpotifyLibrary {
         executeRequest(playRequest);
     }
 
-    public void addTrackToQueue(String trackUri) {
-        final AddItemToUsersPlaybackQueueRequest addItemToUsersPlaybackQueueRequest = this.getSpotifyApi()
+    private void addTrackToQueue(String trackUri) {
+        AddItemToUsersPlaybackQueueRequest addItemToUsersPlaybackQueueRequest = this.getSpotifyApi()
                 .addItemToUsersPlaybackQueue(trackUri)
                 .device_id(deviceId)
                 .build();
@@ -144,7 +106,7 @@ public class SpotifyPlayer extends SpotifyLibrary {
     }
 
     public void pausePlaying() {
-        final PauseUsersPlaybackRequest pauseUsersPlaybackRequest = this.getSpotifyApi()
+        PauseUsersPlaybackRequest pauseUsersPlaybackRequest = this.getSpotifyApi()
                 .pauseUsersPlayback()
                 .device_id(deviceId)
                 .build();
@@ -152,7 +114,7 @@ public class SpotifyPlayer extends SpotifyLibrary {
     }
 
     public void resumePlaying() {
-        final StartResumeUsersPlaybackRequest startResumeUsersPlaybackRequest = this.getSpotifyApi()
+        StartResumeUsersPlaybackRequest startResumeUsersPlaybackRequest = this.getSpotifyApi()
                 .startResumeUsersPlayback()
                 .device_id(deviceId)
                 .build();
@@ -160,7 +122,7 @@ public class SpotifyPlayer extends SpotifyLibrary {
     }
 
     public void nextTrack() {
-        final SkipUsersPlaybackToNextTrackRequest skipUsersPlaybackToNextTrackRequest = this.getSpotifyApi()
+        SkipUsersPlaybackToNextTrackRequest skipUsersPlaybackToNextTrackRequest = this.getSpotifyApi()
                 .skipUsersPlaybackToNextTrack()
                 .device_id(deviceId)
                 .build();
@@ -168,7 +130,7 @@ public class SpotifyPlayer extends SpotifyLibrary {
     }
 
     public void previousTrack() {
-        final SkipUsersPlaybackToPreviousTrackRequest skipUsersPlaybackToPreviousTrackRequest = this.getSpotifyApi()
+        SkipUsersPlaybackToPreviousTrackRequest skipUsersPlaybackToPreviousTrackRequest = this.getSpotifyApi()
                 .skipUsersPlaybackToPreviousTrack()
                 .device_id(deviceId)
                 .build();
@@ -176,7 +138,7 @@ public class SpotifyPlayer extends SpotifyLibrary {
     }
 
     public void setVolume(int volumePercent) {
-        final SetVolumeForUsersPlaybackRequest setVolumeForUsersPlaybackRequest = this.getSpotifyApi()
+        SetVolumeForUsersPlaybackRequest setVolumeForUsersPlaybackRequest = this.getSpotifyApi()
                 .setVolumeForUsersPlayback(volumePercent)
                 .device_id(deviceId)
                 .build();
