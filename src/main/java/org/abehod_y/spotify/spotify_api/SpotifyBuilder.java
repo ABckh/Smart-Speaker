@@ -30,15 +30,15 @@ public class SpotifyBuilder {
         TimerTask hourlyTask = new TimerTask() {
             @Override
             public void run() {
-                try {
-                    AuthorizationCodeRefreshRequest authorizationCodeRefreshRequest = spotifyApi.authorizationCodeRefresh().build();
-                    String newAccessToken = authorizationCodeRefreshRequest
-                            .execute()
-                            .getAccessToken();
-                    spotifyApi.setAccessToken(newAccessToken);
-                } catch (IOException | ParseException | SpotifyWebApiException e) {
-                    System.out.println("Error: " + e.getMessage());
-                }
+            try {
+                AuthorizationCodeRefreshRequest authorizationCodeRefreshRequest = spotifyApi.authorizationCodeRefresh().build();
+                String newAccessToken = authorizationCodeRefreshRequest
+                        .execute()
+                        .getAccessToken();
+                spotifyApi.setAccessToken(newAccessToken);
+            } catch (IOException | ParseException | SpotifyWebApiException e) {
+                System.out.println("Error: " + e.getMessage());
+            }
             }
         };
         timer.schedule(hourlyTask, 0L, 1000*60*60);

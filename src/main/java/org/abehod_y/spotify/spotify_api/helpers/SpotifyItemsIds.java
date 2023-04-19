@@ -14,21 +14,21 @@ import static org.abehod_y.spotify.spotify_api.helpers.ArraysHelpers.getItemsOrN
 import static org.abehod_y.spotify.spotify_api.helpers.Requests.*;
 
 public class SpotifyItemsIds {
+    private SpotifyItemsIds() {}
 
     public static String getCurrentlyPlayingTrackId(SpotifyApi spotifyApi) {
         GetUsersCurrentlyPlayingTrackRequest getUsersCurrentlyPlayingTrackRequest = spotifyApi
                 .getUsersCurrentlyPlayingTrack()
                 .build();
-        CurrentlyPlaying currentlyPlaying = executeRequestWithReturn(getUsersCurrentlyPlayingTrackRequest);
-        if (currentlyPlaying != null && currentlyPlaying.getIs_playing()) return currentlyPlaying.getItem().getId();
-        else return null;
+        CurrentlyPlaying currentlyPlaying = executeRequestWithDataReturn(getUsersCurrentlyPlayingTrackRequest);
+        return currentlyPlaying != null && currentlyPlaying.getIs_playing() ? currentlyPlaying.getItem().getId() : null;
     }
 
     public static String getArtistId(SpotifyApi spotifyApi, String artistName) {
         SearchArtistsRequest searchArtistsRequest = spotifyApi
                 .searchArtists(artistName)
                 .build();
-        Paging<Artist> artistPaging = executeRequestWithReturn(searchArtistsRequest);
+        Paging<Artist> artistPaging = executeRequestWithDataReturn(searchArtistsRequest);
         Artist artist = getFirstElement(Objects.requireNonNull(getItemsOrNull(artistPaging)));
         return artist != null ? artist.getId() : null;
     }
@@ -37,7 +37,7 @@ public class SpotifyItemsIds {
         SearchPlaylistsRequest searchPlaylistRequest = spotifyApi
                 .searchPlaylists("Release Radar")
                 .build();
-        Paging<PlaylistSimplified> playlists = executeRequestWithReturn(searchPlaylistRequest);
+        Paging<PlaylistSimplified> playlists = executeRequestWithDataReturn(searchPlaylistRequest);
         PlaylistSimplified playlist = getFirstElement(Objects.requireNonNull(getItemsOrNull(playlists)));
         return playlist != null ? playlist.getId() : null;
     }

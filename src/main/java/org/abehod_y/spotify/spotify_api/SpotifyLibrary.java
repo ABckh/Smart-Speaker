@@ -16,7 +16,7 @@ import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistsItemsRequest
 import se.michaelthelin.spotify.requests.data.search.SearchItemRequest;
 import se.michaelthelin.spotify.requests.data.search.simplified.SearchAlbumsRequest;
 
-import static org.abehod_y.spotify.spotify_api.helpers.ArraysHelpers.getItemsOrNull;
+import static org.abehod_y.spotify.spotify_api.helpers.ArraysHelpers.*;
 import static org.abehod_y.spotify.spotify_api.helpers.Requests.*;
 import static org.abehod_y.spotify.spotify_api.helpers.SpotifyItemsIds.getArtistId;
 
@@ -33,7 +33,7 @@ public class SpotifyLibrary extends SpotifyBuilder {
                 .offset(0)
                 .build();
 
-        Paging<SavedTrack> savedTracks = executeRequestWithReturn(getUsersSavedTracksRequest);
+        Paging<SavedTrack> savedTracks = executeRequestWithDataReturn(getUsersSavedTracksRequest);
         return getItemsOrNull(savedTracks);
     }
 
@@ -43,7 +43,7 @@ public class SpotifyLibrary extends SpotifyBuilder {
                 .limit(50)
                 .build();
 
-        Paging<SavedAlbum> savedAlbums = executeRequestWithReturn(getCurrentUsersSavedAlbumsRequest);
+        Paging<SavedAlbum> savedAlbums = executeRequestWithDataReturn(getCurrentUsersSavedAlbumsRequest);
         return getItemsOrNull(savedAlbums);
     }
 
@@ -54,8 +54,8 @@ public class SpotifyLibrary extends SpotifyBuilder {
                 .target_popularity(100)
                 .build();
 
-        Recommendations recommendations = executeRequestWithReturn(getRecommendationsRequest);
-        return getItemsOrNull(recommendations);
+        Recommendations recommendations = executeRequestWithDataReturn(getRecommendationsRequest);
+        return getTracksOrNull(recommendations);
     }
 
     Track[] getTracksByArtist(String name) {
@@ -71,7 +71,7 @@ public class SpotifyLibrary extends SpotifyBuilder {
                 .getArtistsAlbums(getArtistId(this.getSpotifyApi(), name))
                 .build();
 
-        Paging<AlbumSimplified> albums = executeRequestWithReturn(getArtistsAlbumsRequest);
+        Paging<AlbumSimplified> albums = executeRequestWithDataReturn(getArtistsAlbumsRequest);
         return getItemsOrNull(albums);
     }
 
@@ -81,7 +81,7 @@ public class SpotifyLibrary extends SpotifyBuilder {
                 .limit(LIMIT)
                 .build();
 
-        Paging<TrackSimplified> tracks = executeRequestWithReturn(getAlbumsTracksRequest);
+        Paging<TrackSimplified> tracks = executeRequestWithDataReturn(getAlbumsTracksRequest);
         return getItemsOrNull(tracks);
     }
 
@@ -90,7 +90,7 @@ public class SpotifyLibrary extends SpotifyBuilder {
                 .getPlaylistsItems(playlistId)
                 .build();
 
-        Paging<PlaylistTrack> tracks = executeRequestWithReturn(getPlaylistsItemsRequest);
+        Paging<PlaylistTrack> tracks = executeRequestWithDataReturn(getPlaylistsItemsRequest);
         return getItemsOrNull(tracks);
     }
 
@@ -99,8 +99,8 @@ public class SpotifyLibrary extends SpotifyBuilder {
                 .searchItem(query, ModelObjectType.TRACK.getType())
                 .build();
 
-        SearchResult tracks = executeRequestWithReturn(searchItemRequest);
-        return getItemsOrNull(tracks);
+        SearchResult tracks = executeRequestWithDataReturn(searchItemRequest);
+        return getTracksOrNull(tracks);
     }
 
     AlbumSimplified[] getAlbumByQuery(String query) {
@@ -108,7 +108,7 @@ public class SpotifyLibrary extends SpotifyBuilder {
                 .searchAlbums(query)
                 .build();
 
-        Paging<AlbumSimplified> albums = executeRequestWithReturn(searchAlbumsRequest);
+        Paging<AlbumSimplified> albums = executeRequestWithDataReturn(searchAlbumsRequest);
         return getItemsOrNull(albums);
     }
 

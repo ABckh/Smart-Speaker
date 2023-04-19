@@ -1,13 +1,13 @@
 package org.abehod_y.spotify.spotify_api.helpers;
 
-import se.michaelthelin.spotify.model_objects.AbstractModelObject;
 import se.michaelthelin.spotify.model_objects.special.SearchResult;
 import se.michaelthelin.spotify.model_objects.specification.*;
 
 import java.util.Random;
 
 public class ArraysHelpers {
-    public static <T extends AbstractModelObject> void shuffle(T[] arr) {
+    private ArraysHelpers() {}
+    public static <T> void shuffle(T[] arr) {
         Random rand = new Random();
         for (int i = arr.length - 1; i >= 1; i--) {
             int j = rand.nextInt(i + 1);
@@ -17,29 +17,27 @@ public class ArraysHelpers {
         }
     }
 
-    public static <T extends AbstractModelObject> T[] getItemsOrNull(Paging<T> paging) {
-        if (paging == null) return null;
-        return paging.getItems();
+    public static <T> T[] getItemsOrNull(Paging<T> paging) {
+        return paging != null ? paging.getItems() : null;
     }
 
-    public static TrackSimplified[] getItemsOrNull(Recommendations recommendations) {
-        if (recommendations == null) return null;
-        return recommendations.getTracks();
+    public static TrackSimplified[] getTracksOrNull(Recommendations recommendations) {
+        return recommendations != null ? recommendations.getTracks() : null;
     }
 
-    public static Track[] getItemsOrNull(SearchResult searchResult) {
-        if (searchResult == null) return null;
-        return searchResult.getTracks().getItems();
+    public static Track[] getTracksOrNull(SearchResult searchResult) {
+        return searchResult != null ? searchResult.getTracks().getItems() : null;
     }
 
     public static <T> T getFirstElement(T[] array) {
-        if (array.length == 0) return null;
-        return array[0];
+        return array.length == 0 ? null : array[0];
     }
 
-    public static AlbumSimplified getFirstAlbumFromArray(AlbumSimplified[] albums) {
-        for (AlbumSimplified album : albums) {
-            if (album.getAlbumType().getType().equals("album")) return album;
+    public static <T extends AlbumSimplified> T getFirstAlbumFromArray(T[] albums) {
+        for (T album : albums) {
+            if ("album".equals(album.getAlbumType().getType())) {
+                return album;
+            }
         }
         return null;
     }

@@ -9,6 +9,7 @@ import se.michaelthelin.spotify.requests.data.AbstractDataRequest;
 import java.io.IOException;
 
 public class Requests {
+    private Requests() {}
     public static void executeRequest(AbstractRequest<?> request) {
         try {
             request.execute();
@@ -17,7 +18,7 @@ public class Requests {
         }
     }
 
-    public static <T extends AbstractModelObject> T executeRequestWithReturn(AbstractDataRequest<T> request) {
+    public static <T extends AbstractModelObject> T executeRequestWithDataReturn(AbstractDataRequest<T> request) {
         try {
             return request.execute();
         } catch (IOException | ParseException | SpotifyWebApiException e) {
@@ -34,5 +35,4 @@ public class Requests {
             return null;
         }
     }
-
 }

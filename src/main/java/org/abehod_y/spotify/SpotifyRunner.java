@@ -36,6 +36,8 @@ public class SpotifyRunner {
         }
     }
 
+    // (please) play (@some) (suggested) $genres:genre (music) (please)
+    // (please) play @some $musicOrAlbum:item
     private void playSomeMusic() {
         System.out.println("Playing music on spotify");
         if (slots.containsKey("genre")) {
@@ -46,16 +48,21 @@ public class SpotifyRunner {
         }
     }
 
+    // pause
+    // stop
     private void pausePlayback() {
         System.out.println("Stopping...");
         spotifyPlayer.pausePlaying();
     }
 
+    // resume
+    // continue
     private void resumePlayback() {
         System.out.println("Resuming...");
         spotifyPlayer.resumePlaying();
     }
 
+    // (please) (play) $nextOrPrevious:pointer (please) (@track) (please)
     private void changeTrack() {
         if (slots.containsKey("pointer")) {
             System.out.println("Changing track...");
@@ -64,6 +71,7 @@ public class SpotifyRunner {
         }
     }
 
+    // (please) $add_remove:action (this) @track (@to_from_liked)(please)
     private void addRemoveTrack()  {
         if (slots.containsKey("action")) {
             System.out.println("Added or Removed track");
@@ -73,12 +81,15 @@ public class SpotifyRunner {
         }
     }
 
+    // (please) set volume to @max (please)
+    //  (please) set volume to $pv.TwoDigitInteger:volume (percent)(please)
     private void setVolume()  {
         System.out.println("Setting volume...");
         if (slots.containsKey("volume")) spotifyPlayer.setVolume(Integer.parseInt(slots.get("volume")));
         else spotifyPlayer.setVolume(100);
     }
 
+    // (please) play (any) $songOrAlbum:type by $artists:artist (please)
     private void playByArtist()  {
         if (slots.containsKey("type") && slots.containsKey("artist")) {
             System.out.println("Playing music by artist");
@@ -87,11 +98,13 @@ public class SpotifyRunner {
         }
     }
 
+    // (please) play (@some) new (music)(please)
     private void playNewMusic()  {
         System.out.println("Playing new music");
         spotifyPlayer.playNewMusic();
     }
 
+    // (please) play (concrete) $songOrAlbum:item (by name) (please)
     private void playConcreteSongOrAlbum() {
         try {
             String query = picovoiceRunner.getSearchQueryWithCheetah();
