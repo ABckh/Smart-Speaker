@@ -66,7 +66,7 @@ public class SpotifyPlayer extends SpotifyLibrary {
 
         AlbumSimplified[] foundAlbums = getAlbumByQuery(query);
         AlbumSimplified album = getFirstElement(foundAlbums);
-        if (album!= null) playAlbumTracks(album.getId());
+        if (album!= null) playAlbumTracks(album);
     }
 
     private void playAlbumTracks(Object album) {
@@ -83,9 +83,12 @@ public class SpotifyPlayer extends SpotifyLibrary {
     private void playMultipleTracksInARow(Object[] tracks) {
         if (tracks.length == 0) return;
 
-        playTrack(getIdFromTrack(tracks[0]));
+        String trackId = getIdFromTrack(tracks[0]);
+        playTrack(trackId);
+
         for (int i = 1; i < tracks.length; i++) {
-            addTrackToQueue(getUriFromTrack(tracks[i]));
+            String trackUri = getUriFromTrack(tracks[i]);
+            addTrackToQueue(trackUri);
         }
     }
 
@@ -103,6 +106,7 @@ public class SpotifyPlayer extends SpotifyLibrary {
                 .device_id(deviceId)
                 .build();
         executeRequest(addItemToUsersPlaybackQueueRequest);
+        stopThread(100);
     }
 
     public void pausePlaying() {
@@ -134,6 +138,7 @@ public class SpotifyPlayer extends SpotifyLibrary {
                 .skipUsersPlaybackToPreviousTrack()
                 .device_id(deviceId)
                 .build();
+        executeRequest(skipUsersPlaybackToPreviousTrackRequest);
         executeRequest(skipUsersPlaybackToPreviousTrackRequest);
     }
 

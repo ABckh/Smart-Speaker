@@ -43,8 +43,9 @@ public class SpotifyItemsIds {
     }
 
     public static String extractAlbumId(Object album) {
-        if (album instanceof Track) return ((Track) album).getId();
-        else if (album instanceof TrackSimplified) return ((TrackSimplified) album).getId();
+        if (album instanceof Album) return ((Album) album).getId();
+        else if (album instanceof AlbumSimplified) return ((AlbumSimplified) album).getId();
+        else if (album instanceof SavedAlbum) return ((SavedAlbum) album).getAlbum().getId();
         return null;
     }
 

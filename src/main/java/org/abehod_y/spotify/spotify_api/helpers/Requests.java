@@ -10,11 +10,20 @@ import java.io.IOException;
 
 public class Requests {
     private Requests() {}
+
     public static void executeRequest(AbstractRequest<?> request) {
         try {
             request.execute();
         } catch (IOException | ParseException | SpotifyWebApiException e) {
             System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    public static void stopThread(int milliseconds) {
+        try {
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 
