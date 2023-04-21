@@ -2,11 +2,16 @@ Smart Speaker
 =============
 
 ## Overview ##
+&nbsp; &nbsp; The application is a software program that enables users to play and control music on a speaker device through voice commands. The application is designed to provide a simple and intuitive interface that allows users to play music and control playback on Spotify.
 
+&nbsp; &nbsp; The technologies, which are used:
+* Java 17
+* Porcupine Wake Word (https://picovoice.ai/docs/porcupine/)
+* Rhino Speech-to-Intent (https://picovoice.ai/docs/rhino/) 
+* Cheetah Speech-to-Text (https://picovoice.ai/docs/cheetah/)
+* Spotify API Library (https://github.com/spotify-web-api-java/spotify-web-api-java)
 
-
-
-## Usage ##
+## Setup ###
 0. Keep in mind that before next steps you should have Spotify client installed on your system, in case your system is Raspberry pi you should have raspotify installed (https://github.com/dtcooper/raspotify)
 
 1. Clone the repository
@@ -87,3 +92,7 @@ Smart Speaker
     ```
    mvn exec:java
    ```
+After everything is installed and the program is running, you can try it! The instruction how to use is written below! 
+
+## Usage ##
+
