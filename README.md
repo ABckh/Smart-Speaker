@@ -95,4 +95,123 @@ Smart Speaker
 After everything is installed and the program is running, you can try it! The instruction how to use is written below! 
 
 ## Usage ##
+1. Activate Picovoice: To activate Siri, simply say "```Picovoice```", after that you will see this message in the console:
+```
+Wake word is detected!
+```
+2. Give a command. All the possible commands are listed in ```Commands``` section.
 
+3. That's it! Smart speaker will execute your command and print a messasge about it! 
+
+
+## Commands
+> Important thing about commands: slash symbol (/) means or, also everything which is in brackets is optional to say and the programm will understand the context without them! <br />
+>  For example: <br />
+> ``` (please) pause/stop (music)```  <br />
+> This command means that you can say either ```pause``` or ```stop``` and you can not say ```please``` and ```music``` at all!
+
+* To pause playback:
+  ```
+  (please) pause/stop (music)
+  ```
+
+* To resume playback:
+  ```
+  (please) continue/resume (music)
+  ```
+
+* To change track to next:
+  ```
+  (please) (play) next (song/track)
+  ```
+
+* To change track to previous:
+  ```
+  (please) (play) previous (song/track)
+  ```
+
+* To add track to liked:
+  ```
+  (please) add/save (this) song/track (to liked) (please)
+  ```
+
+* To remove track from liked:
+  ```
+  (please) remove (this) song/track (from liked) (please)
+  ```
+
+* To set volume to maximum:
+  ```
+  (please) set volume to max/maximum (please)
+  ```
+
+* To set volume to a certain percentage (you should replace { number } with two digit number):
+  ```
+  (please) set volume to { number } (percent)(please)
+  ```
+
+* To play new music: 
+  > This command will play 'Release Radar' playlist, which contains all new releases from your favorite artists
+  ```
+  (please) play (some/something) new (music)(please)
+  ```
+
+* To play some random music:
+  > This command will play 50 newest songs from your liked shuffled
+  ```
+  (please) play some music
+  ```
+
+* To play some random album:
+  > This command will play some album from your liked
+  ```
+  (please) play some album
+  ```
+
+* To play music by genrea (you should replace { genre } with any genre):
+  > All possible genres are listed in slots.yml
+  ```
+  (please) play (some/something) (suggested) { genre } (music) (please)
+  ```
+
+* To play song by artist:
+  > All possible artists are listed in slots.yml
+  ```
+  (please) play (any) song by { artist } (please)
+  ```
+
+* To play album by artist:
+
+  > All possible artists are listed in slots.yml
+  ```
+  (please) play (any) album by { artist } (please)
+  ```
+
+* To play concrete song:
+  ``` 
+  (please) play (concrete) song (by name) (please)
+  ```
+  &nbsp; &nbsp; After this command you will see this message:
+  ```
+  Now listening...
+  ``` 
+  &nbsp; &nbsp; After this message you will have 7 seconds to say the name of the song. <br />
+
+* To play concrete album:
+  ``` 
+  (please) play (concrete) album (by name) (please)
+  ```
+  &nbsp; &nbsp; After this command you will see this message:
+  ```
+  Now listening...
+  ``` 
+  &nbsp; &nbsp; After this message you will have 7 seconds to say the name of the album.
+
+## Features to add ##
+In the future I am planning to add these features:
+* Add search functionality to get information about weather and overall data from the internet
+* To add timer and alarm functionality <br />
+  
+If you want to help, feel free to open PRs!
+
+# Pleasent use! #

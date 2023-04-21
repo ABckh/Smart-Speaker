@@ -1,0 +1,134 @@
+context:
+  expressions:
+    Pause:
+      - (please) @pause (music)
+    Resume:
+      - (please) @resume (music)
+    PlaySomeMusic:
+      - (please) play (@some) (suggested) $genres:genre (music) (please)
+      - (please) play @some $musicOrAlbum:item
+    ChangeTrack:
+      - (please) (play) $nextOrPrevious:pointer (please) (@track) (please)
+    AddRemoveTrack:
+      - (please) $add_remove:action (this) @track (@to_from_liked)(please)
+    SetVolume:
+      - (please) set volume to @max (please)
+      - (please) set volume to $pv.TwoDigitInteger:volume (percent)(please)
+    PlayByArtist:
+      - (please) play (any) $songOrAlbum:type by $artists:artist (please)
+    PlayNewMusic:
+      - (please) play (@some) new (music)(please)
+    PlayConcreteSongOrAlbum:
+      - (please) play (concrete) $songOrAlbum:item (by name) (please)
+  slots:
+    artists:
+      - low roar
+      - harry styles
+      - frank ocean
+      - oasis
+      - polo g
+      - elder island
+      - tom Odell
+      - wallows
+      - the neighborhood
+      - pop smoke
+      - arcade fire
+      - broken bells
+      - the killers
+      - cage the elephant
+      - the weekend
+      - passenger
+      - joji
+      - Green day
+      - lil baby
+      - black
+      - Red hot chilli Peppers
+      - Depeche mode
+      - arctic monkeys
+      - Foals
+      - Blue october
+      - Fred again
+      - Kendrick Lamar
+      - Mac miller
+      - Denzel curry
+      - Oliver tree
+      - freestyle fellowship
+      - twenty one pilots
+      - Manchester orchestra
+      - central cee
+      - j cole
+      - Tame Impala
+      - Lana del ray
+      - Steve lacy
+      - Tyler the creator
+      - alt j
+      - Don Toliver
+      - Drake
+      - Travis Scott
+      - Childish Gambino
+    add_remove:
+      - remove
+      - add
+    songOrAlbum:
+      - song
+      - album
+    nextOrPrevious:
+      - previous
+      - next
+    newOrSuggested:
+      - suggested
+      - new
+    new:
+      - new
+    genres:
+      - world music
+      - techno
+      - rock
+      - r n b
+      - punk
+      - pop
+      - new release
+      - new age
+      - indie pop
+      - indie
+      - house
+      - electro
+      - deep house
+      - dancehall
+      - dance
+      - breakbeat
+      - ambient
+      - alternative
+      - alt rock
+      - hip hop
+    musicOrAlbum:
+      - album
+      - music
+  macros:
+    track:
+      - song
+      - track
+    max:
+      - maximum
+      - max
+    remove:
+      - delete
+      - remove
+    add:
+      - save
+      - add
+    resume:
+      - resume
+      - continue
+    pause:
+      - pause
+      - stop
+    to_from_liked:
+      - from saved
+      - from liked
+      - to saved
+      - to liked
+    some:
+      - any
+      - something
+      - some
