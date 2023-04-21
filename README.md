@@ -1,7 +1,6 @@
 Smart Speaker
 =============
 
-## Overview ##
 &nbsp; &nbsp; The application is a software program that enables users to play and control music on a speaker device through voice commands. The application is designed to provide a simple and intuitive interface that allows users to play music and control playback on Spotify.
 
 &nbsp; &nbsp; The technologies, which are used:
