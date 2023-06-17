@@ -6,6 +6,8 @@ import ai.picovoice.picovoice.Picovoice;
 import ai.picovoice.picovoice.PicovoiceException;
 import ai.picovoice.picovoice.PicovoiceInferenceCallback;
 import org.abehod_y.spotify.SpotifyRunner;
+import java.awt.Toolkit;
+
 
 import java.util.Map;
 
@@ -19,7 +21,8 @@ public class PicovoiceBuilder {
         this.picovoice = new Picovoice.Builder()
                 .setAccessKey(accessKey)
                 .setKeywordPath(keywordPath)
-                .setWakeWordCallback(() -> System.out.println("Wake word detected!"))
+//                .setWakeWordCallback(() -> System.out.println("Wake word detected!"))
+                .setWakeWordCallback(() -> Toolkit.getDefaultToolkit().beep())
                 .setContextPath(contextPath)
                 .setInferenceCallback(getInferenceCallback())
                 .build();

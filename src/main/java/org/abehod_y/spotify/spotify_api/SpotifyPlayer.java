@@ -1,5 +1,6 @@
 package org.abehod_y.spotify.spotify_api;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 import se.michaelthelin.spotify.model_objects.specification.*;
 import se.michaelthelin.spotify.requests.data.player.*;
@@ -7,7 +8,6 @@ import se.michaelthelin.spotify.requests.data.player.*;
 import static org.abehod_y.spotify.spotify_api.helpers.ArraysHelpers.*;
 import static org.abehod_y.spotify.spotify_api.helpers.SpotifyItemsIds.*;
 import static org.abehod_y.spotify.spotify_api.helpers.Requests.*;
-
 
 public class SpotifyPlayer extends SpotifyLibrary {
     private final String deviceId;
@@ -54,19 +54,23 @@ public class SpotifyPlayer extends SpotifyLibrary {
     }
 
     public void playTrackByQuery(String query) {
-        if (query.isEmpty()) return;
+        if (query.isEmpty())
+            return;
 
         Track[] foundTracks = getTrackByQuery(query);
         Track track = getFirstElement(foundTracks);
-        if (track!= null) playTrack(track.getId());
+        if (track != null)
+            playTrack(track.getId());
     }
 
     public void playAlbumByQuery(String query) {
-        if (query.isEmpty()) return;
+        if (query.isEmpty())
+            return;
 
         AlbumSimplified[] foundAlbums = getAlbumByQuery(query);
         AlbumSimplified album = getFirstElement(foundAlbums);
-        if (album!= null) playAlbumTracks(album);
+        if (album != null)
+            playAlbumTracks(album);
     }
 
     private void playAlbumTracks(Object album) {
@@ -81,7 +85,8 @@ public class SpotifyPlayer extends SpotifyLibrary {
     }
 
     private void playMultipleTracksInARow(Object[] tracks) {
-        if (tracks.length == 0) return;
+        if (tracks.length == 0)
+            return;
 
         String trackId = getIdFromTrack(tracks[0]);
         playTrack(trackId);
@@ -93,11 +98,20 @@ public class SpotifyPlayer extends SpotifyLibrary {
     }
 
     private void playTrack(String trackId) {
+        transferPlayback();
         StartResumeUsersPlaybackRequest playRequest = this.getSpotifyApi().startResumeUsersPlayback()
                 .uris(JsonParser.parseString("[\"spotify:track:" + trackId + "\"]").getAsJsonArray())
                 .device_id(deviceId)
                 .build();
         executeRequest(playRequest);
+    }
+
+    private void transferPlayback() {
+        JsonArray deviceIds = JsonParser.parseString(String.format("[\"%s\"]", deviceId)).getAsJsonArray();
+        TransferUsersPlaybackRequest transferUsersPlaybackRequest = this.getSpotifyApi()
+                .transferUsersPlayback(deviceIds)
+                .build();
+        executeRequest(transferUsersPlaybackRequest);
     }
 
     private void addTrackToQueue(String trackUri) {

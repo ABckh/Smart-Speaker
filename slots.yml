@@ -1,67 +1,67 @@
 slots:
-    artists:
-      - low roar
-      - harry styles
-      - frank ocean
-      - oasis
-      - polo g
-      - elder island
-      - tom Odell
-      - wallows
-      - the neighborhood
-      - pop smoke
-      - arcade fire
-      - broken bells
-      - the killers
-      - cage the elephant
-      - the weekend
-      - passenger
-      - joji
-      - Green day
-      - lil baby
-      - black
-      - Red hot chilli Peppers
-      - Depeche mode
-      - arctic monkeys
-      - Foals
-      - Blue october
-      - Fred again
-      - Kendrick Lamar
-      - Mac miller
-      - Denzel curry
-      - Oliver tree
-      - freestyle fellowship
-      - twenty one pilots
-      - Manchester orchestra
-      - central cee
-      - j cole
-      - Tame Impala
-      - Lana del ray
-      - Steve lacy
-      - Tyler the creator
-      - alt j
-      - Don Toliver
-      - Drake
-      - Travis Scott
-      - Childish Gambino
-    genres:
-      - world music
-      - techno
-      - rock
-      - r n b
-      - punk
-      - pop
-      - new release
-      - new age
-      - indie pop
-      - indie
-      - house
-      - electro
-      - deep house
-      - dancehall
-      - dance
-      - breakbeat
-      - ambient
-      - alternative
-      - alt rock
-      - hip hop
+  artists:
+    - low roar
+    - harry styles
+    - frank ocean
+    - oasis
+    - polo g
+    - elder island
+    - tom Odell
+    - wallows
+    - the neighborhood
+    - pop smoke
+    - arcade fire
+    - broken bells
+    - the killers
+    - cage the elephant
+    - the weekend
+    - passenger
+    - joji
+    - Green day
+    - lil baby
+    - black
+    - Red hot chilli Peppers
+    - Depeche mode
+    - arctic monkeys
+    - Foals
+    - Blue october
+    - Fred again
+    - Kendrick Lamar
+    - Mac miller
+    - Denzel curry
+    - Oliver tree
+    - freestyle fellowship
+    - twenty one pilots
+    - Manchester orchestra
+    - central cee
+    - j cole
+    - Tame Impala
+    - Lana del ray
+    - Steve lacy
+    - Tyler the creator
+    - alt j
+    - Don Toliver
+    - Drake
+    - Travis Scott
+    - Childish Gambino
+  genres:
+    - world music
+    - techno
+    - rock
+    - r n b
+    - punk
+    - pop
+    - new release
+    - new age
+    - indie pop
+    - indie
+    - house
+    - electro
+    - deep house
+    - dancehall
+    - dance
+    - breakbeat
+    - ambient
+    - alternative
+    - alt rock
+    - hip hop
